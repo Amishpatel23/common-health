@@ -93,7 +93,7 @@ const mockRecentChats = [
     id: '202',
     name: 'Sarah Miller',
     avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    lastMessage: 'Don't forget to stay hydrated before...',
+    lastMessage: "Don't forget to stay hydrated before...",
     lastMessageTime: 'Yesterday',
     unread: 0,
   },
