@@ -1,0 +1,115 @@
+
+import React, { useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { ArrowRight } from 'lucide-react';
+
+const Hero = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-in');
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const elements = containerRef.current?.querySelectorAll('[data-animate]');
+    elements?.forEach((el) => observer.observe(el));
+
+    return () => {
+      elements?.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
+
+  return (
+    <div className="relative pt-16 overflow-hidden" ref={containerRef}>
+      {/* Background image with overlay */}
+      <div className="absolute inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ 
+            backgroundImage: 'url(https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=2000)'
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/20 backdrop-blur-[1px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20 pb-24 sm:pt-32 sm:pb-40">
+        <div className="max-w-3xl">
+          <div 
+            className="opacity-0" 
+            data-animate 
+            style={{ animationDelay: '0.2s' }}
+          >
+            <span className="inline-block px-4 py-1.5 mb-4 rounded-full text-xs sm:text-sm font-medium bg-white/10 text-white backdrop-blur-sm border border-white/20">
+              Online Fitness Coaching Platform
+            </span>
+          </div>
+
+          <h1 
+            className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6"
+            data-animate
+            style={{ animationDelay: '0.4s' }}
+          >
+            Connect with Expert Trainers for Online Fitness Coaching
+          </h1>
+
+          <p 
+            className="opacity-0 text-lg sm:text-xl text-white/90 mb-8 max-w-2xl"
+            data-animate
+            style={{ animationDelay: '0.6s' }}
+          >
+            Book personalized sessions with certified trainers anytime, anywhere. 
+            Transform your fitness journey with guidance tailored to your goals.
+          </p>
+
+          <div 
+            className="opacity-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4"
+            data-animate
+            style={{ animationDelay: '0.8s' }}
+          >
+            <Button 
+              asChild
+              size="lg" 
+              className={cn(
+                "button-transition text-base font-medium",
+                "bg-primary hover:bg-primary/90",
+                "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+              )}
+            >
+              <Link to="/trainers">
+                Find a Trainer
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button 
+              asChild
+              variant="outline" 
+              size="lg" 
+              className={cn(
+                "button-transition text-base font-medium",
+                "bg-white/10 text-white border-white/20 backdrop-blur-sm",
+                "hover:bg-white/20 hover:border-white/30",
+                "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white"
+              )}
+            >
+              <Link to="/how-it-works">
+                How It Works
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Decorative element */}
+      <div className="hidden lg:block absolute bottom-0 right-0 w-1/3 h-24 bg-gradient-to-r from-transparent to-primary/30 blur-3xl opacity-30 rounded-full transform translate-y-1/2 translate-x-1/4" />
+    </div>
+  );
+};
+
+export default Hero;
