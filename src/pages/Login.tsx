@@ -79,7 +79,7 @@ const Login = () => {
   return (
     <div className="flex min-h-screen">
       {/* Left side - Background image with motivational text */}
-      <div className="hidden md:flex md:w-1/2 relative bg-black">
+      <div className="hidden md:flex md:w-1/2 relative">
         <img 
           src="/lovable-uploads/3fc20d41-a17d-421a-af0f-f8f0168454ae.png" 
           alt="Fitness motivation" 
