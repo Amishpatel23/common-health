@@ -13,7 +13,9 @@ const Login = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({
+    firstName: '',
     email: '',
     password: '',
   });
@@ -32,11 +34,15 @@ const Login = () => {
     if (value) setUserType(value);
   };
 
+  const toggleAuthMode = () => {
+    setIsLogin(prev => !prev);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Form validation
-    if (!formData.email || !formData.password) {
+    if ((!isLogin && !formData.firstName) || !formData.email || !formData.password) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -53,7 +59,7 @@ const Login = () => {
       
       toast({
         title: "Success!",
-        description: "You have successfully logged in.",
+        description: isLogin ? "You have successfully logged in." : "Your account has been created.",
       });
       
       // Redirect based on user type
@@ -67,8 +73,10 @@ const Login = () => {
       
     } catch (error) {
       toast({
-        title: "Login Failed",
-        description: "Invalid email or password. Please try again.",
+        title: isLogin ? "Login Failed" : "Registration Failed",
+        description: isLogin 
+          ? "Invalid email or password. Please try again." 
+          : "There was an error creating your account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -103,8 +111,12 @@ const Login = () => {
                 <span className="text-white text-xl font-bold">C</span>
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-2">Welcome back</h2>
-            <p className="text-muted-foreground">continue your fitness journey</p>
+            <h2 className="text-2xl font-bold mb-2">
+              {isLogin ? "Welcome back" : "Let's get you started"}
+            </h2>
+            <p className="text-muted-foreground">
+              {isLogin ? "continue your fitness journey" : "on this fitness journey"}
+            </p>
           </div>
           
           {/* User type toggle */}
@@ -131,6 +143,23 @@ const Login = () => {
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* First Name Field - Only for signup */}
+            {!isLogin && (
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="firstName">First Name <span className="text-red-500">*</span></Label>
+                </div>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  placeholder="First name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+            
             {/* Email Field */}
             <div className="space-y-2">
               <div className="flex justify-between">
@@ -153,12 +182,14 @@ const Login = () => {
                 <Label htmlFor="password">
                   Password <span className="text-red-500">*</span>
                 </Label>
-                <Link 
-                  to="/forgot-password" 
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  Forgot password?
-                </Link>
+                {isLogin && (
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                )}
               </div>
               <div className="relative">
                 <Input
@@ -187,20 +218,23 @@ const Login = () => {
               className="w-full py-6 bg-red-600 hover:bg-red-700"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Login'}
+              {isLoading 
+                ? (isLogin ? 'Signing in...' : 'Creating account...') 
+                : (isLogin ? 'Login' : 'Next')}
             </Button>
           </form>
           
-          {/* Signup link */}
+          {/* Toggle between signup and login */}
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
-              <Link 
-                to="/signup" 
+              {isLogin ? "Don't have an account?" : "Already Registered?"}{' '}
+              <button 
+                type="button"
+                onClick={toggleAuthMode}
                 className="font-medium text-primary hover:underline"
               >
-                Sign up
-              </Link>
+                {isLogin ? 'Sign up' : 'Login'}
+              </button>
             </p>
           </div>
         </div>
