@@ -13,27 +13,41 @@ const CTABanner = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in');
+            const animatedElements = entry.target.querySelectorAll('[data-animate]');
+            animatedElements.forEach((el, index) => {
+              setTimeout(() => {
+                el.classList.add('animate-fade-in');
+              }, index * 150);
+            });
           }
         });
       },
       { threshold: 0.1 }
     );
 
-    const elements = containerRef.current?.querySelectorAll('[data-animate]');
-    elements?.forEach((el) => observer.observe(el));
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
     return () => {
-      elements?.forEach((el) => observer.unobserve(el));
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
     };
   }, []);
   
   return (
-    <section className="relative overflow-hidden py-20 bg-primary text-white" ref={containerRef}>
+    <section className="relative overflow-hidden py-20 bg-gradient-to-r from-primary to-blue-600 text-white" ref={containerRef}>
       {/* Background decoration */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2" />
+        
+        {/* Dynamic animations */}
+        <div className="absolute top-1/3 left-1/4 w-12 h-12 bg-white/30 rounded-full blur-lg opacity-60 animate-pulse" 
+          style={{ animationDuration: '3s' }} />
+        <div className="absolute bottom-1/4 right-1/3 w-20 h-20 bg-white/20 rounded-full blur-lg opacity-40 animate-pulse" 
+          style={{ animationDuration: '4s', animationDelay: '1s' }} />
       </div>
       
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -74,7 +88,7 @@ const CTABanner = () => {
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
               )}
             >
-              <Link to="/trainers">
+              <Link to="/find-trainers">
                 Explore Trainers
               </Link>
             </Button>

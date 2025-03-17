@@ -12,17 +12,25 @@ const Hero = () => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-fade-in');
+          const animatedElements = entry.target.querySelectorAll('[data-animate]');
+          animatedElements.forEach((el, index) => {
+            setTimeout(() => {
+              el.classList.add('animate-fade-in');
+            }, index * 150);
+          });
         }
       },
       { threshold: 0.1 }
     );
 
-    const elements = containerRef.current?.querySelectorAll('[data-animate]');
-    elements?.forEach((el) => observer.observe(el));
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
     return () => {
-      elements?.forEach((el) => observer.unobserve(el));
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
     };
   }, []);
 
@@ -31,12 +39,13 @@ const Hero = () => {
       {/* Background image with overlay */}
       <div className="absolute inset-0 z-0">
         <div 
-          className="absolute inset-0 bg-cover bg-center" 
+          className="absolute inset-0 bg-cover bg-center transform scale-105 transition-transform duration-10000 hover:scale-110" 
           style={{ 
-            backgroundImage: 'url(https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=2000)'
+            backgroundImage: 'url(https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=2000)',
+            transition: 'transform 15s ease-in-out'
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/20 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/40 backdrop-blur-[2px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20 pb-24 sm:pt-32 sm:pb-40">
@@ -106,8 +115,10 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Decorative element */}
-      <div className="hidden lg:block absolute bottom-0 right-0 w-1/3 h-24 bg-gradient-to-r from-transparent to-primary/30 blur-3xl opacity-30 rounded-full transform translate-y-1/2 translate-x-1/4" />
+      {/* Decorative elements */}
+      <div className="hidden lg:block absolute bottom-0 right-0 w-1/3 h-24 bg-gradient-to-r from-transparent to-primary/30 blur-3xl opacity-50 rounded-full transform translate-y-1/2 translate-x-1/4" />
+      <div className="hidden lg:block absolute top-1/4 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl opacity-30 animate-pulse" />
+      <div className="hidden lg:block absolute bottom-1/3 right-1/4 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s', animationDuration: '4s' }} />
     </div>
   );
 };
