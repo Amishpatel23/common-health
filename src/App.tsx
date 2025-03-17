@@ -13,6 +13,9 @@ import Dashboard from "./pages/Dashboard";
 import TrainerDashboard from "./pages/TrainerDashboard";
 import AdminPanel from "./pages/AdminPanel";
 import Chat from "./pages/Chat";
+import FindTrainers from "./pages/FindTrainers";
+import TrainerProfile from "./pages/TrainerProfile";
+import BookSession from "./pages/BookSession";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,7 +35,10 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/chat" element={<Chat />} /> 
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/find-trainers" element={<FindTrainers />} />
+          <Route path="/trainer-profile/:trainerId" element={<TrainerProfile />} />
+          <Route path="/book-session/:trainerId" element={<BookSession />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
