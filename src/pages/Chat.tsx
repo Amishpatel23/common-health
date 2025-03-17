@@ -83,9 +83,25 @@ const Chat = () => {
   const [contacts, setContacts] = useState(mockContacts);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(mockContacts[0].id);
   const [messages, setMessages] = useState(mockMessages);
+  const [isLoading, setIsLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const { toast } = useToast();
   
   const selectedContact = contacts.find(contact => contact.id === selectedContactId) || null;
+  
+  useEffect(() => {
+    // Simulate loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      
+      // Add a small delay before showing content animation
+      setTimeout(() => {
+        setContentLoaded(true);
+      }, 100);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   const handleContactSelect = (contactId: string) => {
     setSelectedContactId(contactId);
@@ -127,16 +143,39 @@ const Chat = () => {
     }, 3000);
   };
   
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <DashboardNavbar />
+        
+        <div className="flex-1 pt-16 lg:pl-64">
+          <DashboardSidebar />
+          
+          <main className="h-[calc(100vh-4rem)]">
+            <div className="h-full flex border-t border-border">
+              <div className="w-80 border-r border-border shimmer"></div>
+              <div className="flex-1 bg-secondary/30 shimmer"></div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen flex flex-col">
       <DashboardNavbar />
       
       <div className="flex-1 pt-16 lg:pl-64">
-        {/* Sidebar (desktop-only) */}
         <DashboardSidebar />
         
         <main className="h-[calc(100vh-4rem)]">
-          <div className="h-full flex border-t border-border">
+          <div 
+            className={`h-full flex border-t border-border ${
+              contentLoaded ? 'opacity-100' : 'opacity-0'
+            } transition-opacity duration-500`}
+          >
             {/* Chat Sidebar with Contact List */}
             <ChatSidebar 
               contacts={contacts}
@@ -153,7 +192,7 @@ const Chat = () => {
               />
             ) : (
               <div className="flex-1 flex items-center justify-center p-6 bg-secondary/30">
-                <div className="text-center">
+                <div className="text-center animate-fade-in">
                   <h3 className="text-lg font-medium">Select a contact to start chatting</h3>
                   <p className="text-muted-foreground">Choose from your contacts on the left</p>
                 </div>

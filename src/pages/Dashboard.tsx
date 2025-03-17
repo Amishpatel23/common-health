@@ -112,21 +112,25 @@ const Dashboard = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // Simulate loading state
+  // Loading states
   const [isLoading, setIsLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   
   useEffect(() => {
+    // Scroll to top on page load
+    window.scrollTo(0, 0);
+    
     // Simulate API fetch delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+      
+      // Add a small delay before showing content animation
+      setTimeout(() => {
+        setContentLoaded(true);
+      }, 100);
+    }, 800);
     
     return () => clearTimeout(timer);
-  }, []);
-  
-  // Scroll to top on page load
-  useEffect(() => {
-    window.scrollTo(0, 0);
   }, []);
   
   const handleJoinSession = (sessionId: string) => {
@@ -151,31 +155,69 @@ const Dashboard = () => {
   };
   
   const handleViewTrainerProfile = (trainerId: string) => {
-    toast({
-      description: "Viewing trainer profile...",
-    });
-    // In a real app, navigate to trainer profile
+    navigate(`/trainer-profile/${trainerId}`);
   };
   
   const handleChatSelect = (chatId: string) => {
-    toast({
-      description: "Opening chat conversation...",
-    });
-    // In a real app, navigate to chat page with this ID
+    navigate('/chat');
   };
+  
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <DashboardNavbar />
+        
+        <div className="flex-1 pt-16 lg:pl-64">
+          <DashboardSidebar />
+          
+          <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+            {/* Loading skeleton UI */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="w-3/4">
+                <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded-md shimmer mb-3 w-2/3"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md shimmer w-full"></div>
+              </div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded-md shimmer w-40"></div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+              ))}
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+                <div className="h-48 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+              </div>
+              <div className="space-y-6">
+                <div className="h-48 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+                <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
       <DashboardNavbar />
       
       <div className="flex-1 pt-16 lg:pl-64">
-        {/* Sidebar (desktop-only) */}
         <DashboardSidebar />
         
-        <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+        <main 
+          className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 ${
+            contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          } transition-all duration-500`}
+        >
           {/* Welcome message */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
+            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <h1 className="text-2xl sm:text-3xl font-bold">
                 Welcome back, {userName}!
               </h1>
@@ -183,7 +225,11 @@ const Dashboard = () => {
                 Here's what's happening with your fitness journey today.
               </p>
             </div>
-            <Button className="shrink-0" onClick={() => navigate('/find-trainers')}>
+            <Button 
+              className="shrink-0 animate-fade-in hover-lift" 
+              style={{ animationDelay: '200ms' }}
+              onClick={() => navigate('/find-trainers')}
+            >
               <Search className="mr-2 h-4 w-4" />
               Find Trainers
             </Button>
@@ -191,38 +237,49 @@ const Dashboard = () => {
           
           {/* Overview cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <OverviewCard
-              title="Next Session"
-              value="Today at 2:00 PM"
-              description="HIIT with Alex Johnson"
-              icon={<Calendar className="h-5 w-5" />}
-              onClick={() => handleJoinSession('1')}
-              className="cursor-pointer hover:border-primary/50"
-            />
-            <OverviewCard
-              title="Total Sessions"
-              value="12"
-              description="6 completed this month"
-              icon={<Clock className="h-5 w-5" />}
-            />
-            <OverviewCard
-              title="My Trainers"
-              value="4"
-              description="2 active currently"
-              icon={<Users className="h-5 w-5" />}
-            />
-            <OverviewCard
-              title="Subscription"
-              value="Premium"
-              description="Renews on Jul 15, 2023"
-              icon={<CreditCard className="h-5 w-5" />}
-            />
+            <div className="animate-fade-in" style={{ animationDelay: '300ms' }}>
+              <OverviewCard
+                title="Next Session"
+                value="Today at 2:00 PM"
+                description="HIIT with Alex Johnson"
+                icon={<Calendar className="h-5 w-5" />}
+                onClick={() => handleJoinSession('1')}
+                className="cursor-pointer hover:border-primary/50 hover-lift"
+              />
+            </div>
+            <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+              <OverviewCard
+                title="Total Sessions"
+                value="12"
+                description="6 completed this month"
+                icon={<Clock className="h-5 w-5" />}
+                className="hover-lift"
+              />
+            </div>
+            <div className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+              <OverviewCard
+                title="My Trainers"
+                value="4"
+                description="2 active currently"
+                icon={<Users className="h-5 w-5" />}
+                className="hover-lift"
+              />
+            </div>
+            <div className="animate-fade-in" style={{ animationDelay: '600ms' }}>
+              <OverviewCard
+                title="Subscription"
+                value="Premium"
+                description="Renews on Jul 15, 2023"
+                icon={<CreditCard className="h-5 w-5" />}
+                className="hover-lift"
+              />
+            </div>
           </div>
           
           {/* Main content grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left column - Upcoming session */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '700ms' }}>
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
@@ -230,6 +287,7 @@ const Dashboard = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={() => navigate('/my-sessions')}
+                    className="hover-lift"
                   >
                     View All
                   </Button>
@@ -265,14 +323,15 @@ const Dashboard = () => {
             </div>
             
             {/* Right column - Trainer recommendations and chats */}
-            <div className="space-y-6">
-              <div>
+            <div className="space-y-6 animate-fade-in" style={{ animationDelay: '800ms' }}>
+              <div className="bg-white dark:bg-black rounded-xl p-4 border border-border">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Recommended Trainers</h2>
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => navigate('/find-trainers')}
+                    className="hover-lift"
                   >
                     View All
                   </Button>
@@ -283,13 +342,13 @@ const Dashboard = () => {
                     <TrainerRecommendation
                       key={trainer.id}
                       trainer={trainer}
-                      onViewProfile={handleViewTrainerProfile}
+                      onViewProfile={() => handleViewTrainerProfile(trainer.id)}
                     />
                   ))}
                 </div>
               </div>
               
-              <div>
+              <div className="bg-white dark:bg-black rounded-xl p-4 border border-border">
                 <h2 className="text-xl font-semibold mb-4">Recent Chats</h2>
                 <RecentChatsList
                   chats={mockRecentChats}

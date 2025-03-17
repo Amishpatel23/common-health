@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import DashboardNavbar from '@/components/DashboardNavbar';
@@ -15,7 +15,8 @@ import {
   Star, 
   Clock, 
   ChevronDown,
-  ChevronUp 
+  ChevronUp,
+  Loader2 
 } from 'lucide-react';
 
 // Mock trainer data
@@ -96,6 +97,25 @@ const FindTrainers = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState('rating');
+  const [isLoading, setIsLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
+  
+  useEffect(() => {
+    // Scroll to top on page load
+    window.scrollTo(0, 0);
+    
+    // Simulate loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      
+      // Add a small delay before showing content animation
+      setTimeout(() => {
+        setContentLoaded(true);
+      }, 100);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Extract all unique specialties from trainer data
   const allSpecialties = Array.from(
@@ -154,6 +174,32 @@ const FindTrainers = () => {
     navigate(`/book-session/${trainerId}`);
   };
   
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <DashboardNavbar />
+        
+        <div className="flex-1 pt-16 lg:pl-64">
+          <DashboardSidebar />
+          
+          <main className="p-4 md:p-6 max-w-7xl mx-auto">
+            <div className="h-12 bg-gray-200 dark:bg-gray-800 rounded-md shimmer w-1/3 mb-4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md shimmer w-1/2 mb-8"></div>
+            
+            <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded-md shimmer mb-6 w-full"></div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-80 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+              ))}
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen flex flex-col">
       <DashboardNavbar />
@@ -161,8 +207,12 @@ const FindTrainers = () => {
       <div className="flex-1 pt-16 lg:pl-64">
         <DashboardSidebar />
         
-        <main className="p-4 md:p-6 max-w-7xl mx-auto">
-          <div className="mb-6">
+        <main 
+          className={`p-4 md:p-6 max-w-7xl mx-auto ${
+            contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          } transition-all duration-500`}
+        >
+          <div className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">Find a Trainer</h1>
             <p className="text-muted-foreground">
               Search for personal trainers that match your fitness goals and schedule
@@ -170,7 +220,7 @@ const FindTrainers = () => {
           </div>
           
           {/* Search and filter section */}
-          <div className="mb-6">
+          <div className="mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -185,7 +235,7 @@ const FindTrainers = () => {
               <Button
                 variant="outline"
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                className="justify-between"
+                className="justify-between hover-lift"
               >
                 <div className="flex items-center">
                   <Filter className="mr-2 h-4 w-4" />
@@ -214,7 +264,7 @@ const FindTrainers = () => {
             
             {/* Filters panel */}
             {isFiltersOpen && (
-              <div className="bg-secondary/20 p-4 rounded-lg mb-4">
+              <div className="bg-secondary/20 p-4 rounded-lg mb-4 animate-fade-in">
                 <div className="mb-4">
                   <h3 className="font-medium mb-2">Price Range ($ per hour)</h3>
                   <div className="px-2">
@@ -243,7 +293,7 @@ const FindTrainers = () => {
                         variant={selectedSpecialties.includes(specialty) ? "default" : "outline"}
                         size="sm"
                         onClick={() => handleSpecialtyToggle(specialty)}
-                        className="text-xs"
+                        className="text-xs hover-lift"
                       >
                         {specialty}
                       </Button>
@@ -260,74 +310,95 @@ const FindTrainers = () => {
           
           {/* Trainer list */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTrainers.map((trainer) => (
-              <Card key={trainer.id} className="overflow-hidden">
-                <div className="aspect-[3/2] relative">
-                  <img
-                    src={trainer.avatar}
-                    alt={trainer.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-background/90 rounded-full text-xs font-medium flex items-center">
-                    <Star className="mr-1 h-3 w-3 text-yellow-500 fill-yellow-500" />
-                    {trainer.rating}
-                  </div>
-                </div>
-                
-                <CardContent className="p-4">
-                  <div className="mb-3">
-                    <h3 className="font-semibold text-lg">{trainer.name}</h3>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="mr-1 h-3 w-3" />
-                      {trainer.location}
+            {filteredTrainers.length > 0 ? (
+              filteredTrainers.map((trainer, index) => (
+                <Card 
+                  key={trainer.id} 
+                  className="overflow-hidden hover-lift animate-fade-in" 
+                  style={{ animationDelay: `${300 + index * 100}ms` }}
+                >
+                  <div className="aspect-[3/2] relative overflow-hidden">
+                    <img
+                      src={trainer.avatar}
+                      alt={trainer.name}
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                    />
+                    <div className="absolute top-3 right-3 px-2 py-1 bg-background/90 rounded-full text-xs font-medium flex items-center">
+                      <Star className="mr-1 h-3 w-3 text-yellow-500 fill-yellow-500" />
+                      {trainer.rating}
                     </div>
                   </div>
                   
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {trainer.specialties.map((specialty) => (
-                      <span
-                        key={specialty}
-                        className="bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full text-xs"
+                  <CardContent className="p-4">
+                    <div className="mb-3">
+                      <h3 className="font-semibold text-lg">{trainer.name}</h3>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <MapPin className="mr-1 h-3 w-3" />
+                        {trainer.location}
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {trainer.specialties.map((specialty) => (
+                        <span
+                          key={specialty}
+                          className="bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full text-xs"
+                        >
+                          {specialty}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="text-sm">
+                        <span className="font-medium text-base">${trainer.hourlyRate}</span> / hour
+                      </div>
+                      <div className="flex items-center text-sm text-green-600">
+                        <Clock className="mr-1 h-3 w-3" />
+                        {trainer.availability}
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {trainer.bio}
+                    </p>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 hover-lift"
+                        onClick={() => handleViewProfile(trainer.id)}
                       >
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="text-sm">
-                      <span className="font-medium text-base">${trainer.hourlyRate}</span> / hour
+                        View Profile
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="flex-1 hover-lift"
+                        onClick={() => handleBookSession(trainer.id)}
+                      >
+                        Book Session
+                      </Button>
                     </div>
-                    <div className="flex items-center text-sm text-green-600">
-                      <Clock className="mr-1 h-3 w-3" />
-                      {trainer.availability}
-                    </div>
-                  </div>
-                  
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {trainer.bio}
-                  </p>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => handleViewProfile(trainer.id)}
-                    >
-                      View Profile
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => handleBookSession(trainer.id)}
-                    >
-                      Book Session
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-lg font-medium">No trainers match your search criteria</p>
+                <p className="text-muted-foreground mt-2">Try adjusting your filters</p>
+                <Button 
+                  className="mt-4"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setPriceRange([0, 100]);
+                    setSelectedSpecialties([]);
+                  }}
+                >
+                  Reset Filters
+                </Button>
+              </div>
+            )}
           </div>
         </main>
       </div>
