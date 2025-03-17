@@ -51,7 +51,7 @@ const mockTrainers = {
         avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
         rating: 5,
         date: '2 weeks ago',
-        comment: 'Alex is an amazing trainer! His HIIT sessions are challenging but so effective. I've lost 15lbs in just 2 months.',
+        comment: "Alex is an amazing trainer! His HIIT sessions are challenging but so effective. I've lost 15lbs in just 2 months.",
       },
       {
         id: 'r2',
@@ -59,7 +59,7 @@ const mockTrainers = {
         avatar: 'https://randomuser.me/api/portraits/women/42.jpg',
         rating: 5,
         date: '1 month ago',
-        comment: 'I appreciate how Alex tailors workouts to my specific needs. He's knowledgeable and motivating.',
+        comment: "I appreciate how Alex tailors workouts to my specific needs. He's knowledgeable and motivating.",
       },
       {
         id: 'r3',
