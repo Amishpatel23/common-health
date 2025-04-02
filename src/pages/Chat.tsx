@@ -5,6 +5,7 @@ import DashboardNavbar from '@/components/DashboardNavbar';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import ChatSidebar from '@/components/chat/ChatSidebar';
 import ChatConversation from '@/components/chat/ChatConversation';
+import { MessageSquare } from 'lucide-react';
 
 // Mock data for conversations
 const mockContacts = [
@@ -35,6 +36,26 @@ const mockContacts = [
     role: 'trainer',
     lastMessage: 'I sent you the nutrition plan',
     lastMessageTime: '2 days ago',
+    unread: 0,
+    isOnline: true,
+  },
+  {
+    id: '4',
+    name: 'Rachel Kim',
+    avatar: 'https://randomuser.me/api/portraits/women/45.jpg',
+    role: 'member',
+    lastMessage: 'Great job today!',
+    lastMessageTime: 'Tuesday',
+    unread: 0,
+    isOnline: false,
+  },
+  {
+    id: '5',
+    name: 'James Wilson',
+    avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
+    role: 'trainer',
+    lastMessage: 'Do you want to schedule another session this week?',
+    lastMessageTime: 'Monday',
     unread: 0,
     isOnline: true,
   },
@@ -90,6 +111,9 @@ const Chat = () => {
   const selectedContact = contacts.find(contact => contact.id === selectedContactId) || null;
   
   useEffect(() => {
+    // Scroll to top on page load
+    window.scrollTo(0, 0);
+    
     // Simulate loading state
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -154,7 +178,7 @@ const Chat = () => {
           
           <main className="h-[calc(100vh-4rem)]">
             <div className="h-full flex border-t border-border">
-              <div className="w-80 border-r border-border shimmer"></div>
+              <div className="w-80 border-r border-border bg-background shimmer"></div>
               <div className="flex-1 bg-secondary/30 shimmer"></div>
             </div>
           </main>
@@ -192,9 +216,10 @@ const Chat = () => {
               />
             ) : (
               <div className="flex-1 flex items-center justify-center p-6 bg-secondary/30">
-                <div className="text-center animate-fade-in">
-                  <h3 className="text-lg font-medium">Select a contact to start chatting</h3>
-                  <p className="text-muted-foreground">Choose from your contacts on the left</p>
+                <div className="text-center animate-fade-in glass-effect p-8 rounded-xl">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4 text-primary/70" />
+                  <h3 className="text-xl font-medium mb-2">Select a contact to start chatting</h3>
+                  <p className="text-muted-foreground">Choose from your contacts on the left to begin a conversation</p>
                 </div>
               </div>
             )}
