@@ -3,7 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import DashboardNavbar from "./components/DashboardNavbar";
 import Index from "./pages/Index";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/Contact";
@@ -20,6 +22,34 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Create a layout component to handle the navbar logic
+const AppLayout = () => {
+  const location = useLocation();
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
+  const isDashboardRoute = 
+    location.pathname.includes('/dashboard') || 
+    location.pathname.includes('/trainer-dashboard') || 
+    location.pathname.includes('/admin') ||
+    location.pathname.includes('/chat') ||
+    location.pathname.includes('/find-trainers') ||
+    location.pathname.includes('/trainer-profile') ||
+    location.pathname.includes('/book-session') ||
+    location.pathname.includes('/my-sessions');
+  
+  // Don't show any navbar on auth routes
+  if (isAuthRoute) {
+    return null;
+  }
+  
+  // Show dashboard navbar on dashboard routes
+  if (isDashboardRoute) {
+    return <DashboardNavbar />;
+  }
+  
+  // Show regular navbar on other routes
+  return <Navbar />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -27,22 +57,22 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/find-trainers" element={<FindTrainers />} />
-          <Route path="/trainers" element={<FindTrainers />} />
-          <Route path="/trainer-profile/:trainerId" element={<TrainerProfile />} />
-          <Route path="/book-session/:trainerId" element={<BookSession />} />
-          <Route path="/my-sessions" element={<Dashboard />} />
+          <Route path="/" element={<><AppLayout /><Index /></>} />
+          <Route path="/how-it-works" element={<><AppLayout /><HowItWorks /></>} />
+          <Route path="/contact" element={<><AppLayout /><Contact /></>} />
+          <Route path="/login" element={<><AppLayout /><Login /></>} />
+          <Route path="/signup" element={<><AppLayout /><Signup /></>} />
+          <Route path="/dashboard" element={<><AppLayout /><Dashboard /></>} />
+          <Route path="/trainer-dashboard" element={<><AppLayout /><TrainerDashboard /></>} />
+          <Route path="/admin" element={<><AppLayout /><AdminPanel /></>} />
+          <Route path="/chat" element={<><AppLayout /><Chat /></>} />
+          <Route path="/find-trainers" element={<><AppLayout /><FindTrainers /></>} />
+          <Route path="/trainers" element={<><AppLayout /><FindTrainers /></>} />
+          <Route path="/trainer-profile/:trainerId" element={<><AppLayout /><TrainerProfile /></>} />
+          <Route path="/book-session/:trainerId" element={<><AppLayout /><BookSession /></>} />
+          <Route path="/my-sessions" element={<><AppLayout /><Dashboard /></>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<><AppLayout /><NotFound /></>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

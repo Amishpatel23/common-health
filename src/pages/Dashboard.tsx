@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import DashboardNavbar from '@/components/DashboardNavbar';
+// Remove the DashboardNavbar import since we'll use the global navbar
+// import DashboardNavbar from '@/components/DashboardNavbar';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import OverviewCard from '@/components/dashboard/OverviewCard';
 import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
@@ -166,7 +167,7 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <DashboardNavbar />
+        {/* Remove the DashboardNavbar from here */}
         
         <div className="flex-1 pt-16 lg:pl-64">
           <DashboardSidebar />
@@ -205,7 +206,7 @@ const Dashboard = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <DashboardNavbar />
+      {/* Remove the DashboardNavbar from here */}
       
       <div className="flex-1 pt-16 lg:pl-64">
         <DashboardSidebar />

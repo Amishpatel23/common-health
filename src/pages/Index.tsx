@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
+// Remove the Navbar import since we're handling it in App.tsx
+// import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import HowItWorks from '@/components/HowItWorks';
 import TrainerShowcase from '@/components/TrainerShowcase';
@@ -25,7 +26,7 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-      <Navbar />
+      {/* Remove the Navbar from here */}
       <main>
         <Hero />
         <HowItWorks />
