@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -13,7 +12,8 @@ import {
   ScreenShare,
   X,
   Maximize,
-  Minimize
+  Minimize,
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
-// Mock data for the selected session
 const getMockSessionData = (sessionId: string) => {
   return {
     id: sessionId,
@@ -53,7 +52,6 @@ const getMockSessionData = (sessionId: string) => {
   };
 };
 
-// Mock chat messages
 const mockChatMessages = [
   {
     id: 'msg1',
@@ -117,7 +115,6 @@ const VideoSession = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Simulate countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
       setRemainingTime(prev => {
@@ -152,12 +149,11 @@ const VideoSession = () => {
     setChatMessages([...chatMessages, newChatMessage]);
     setNewMessage('');
     
-    // Simulate reply from member
     setTimeout(() => {
       const replyMessage = {
         id: `msg${chatMessages.length + 2}`,
         sender: 'member',
-        text: 'Okay, I understand. I'll try that.',
+        text: "Okay, I understand. I'll try that.",
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setChatMessages(prev => [...prev, replyMessage]);
@@ -195,7 +191,6 @@ const VideoSession = () => {
       description: "Thank you for your feedback!",
     });
     
-    // Navigate back to trainer dashboard
     navigate('/trainer-dashboard');
   };
   
@@ -208,7 +203,6 @@ const VideoSession = () => {
   
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* Header bar */}
       <div className="px-4 py-3 border-b flex items-center justify-between bg-background shadow-sm">
         <div className="flex items-center gap-3">
           <div className="flex items-center">
@@ -230,10 +224,8 @@ const VideoSession = () => {
         </div>
       </div>
       
-      {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden" ref={videoContainerRef}>
         <div className="flex flex-1 overflow-hidden">
-          {/* Video container */}
           <div className="relative flex-1 bg-black">
             {isVideoEnabled ? (
               <div className="absolute inset-0 flex items-center justify-center">
@@ -254,7 +246,6 @@ const VideoSession = () => {
               </div>
             )}
             
-            {/* Self view */}
             <div className="absolute bottom-4 right-4 w-48 h-36 rounded-lg overflow-hidden border-2 border-background shadow-lg">
               {isVideoEnabled ? (
                 <img 
@@ -274,7 +265,6 @@ const VideoSession = () => {
               )}
             </div>
             
-            {/* Session info overlay */}
             <div className="absolute top-4 left-4 bg-black/30 backdrop-blur-sm rounded-lg p-2 text-white">
               <div className="flex items-center gap-2">
                 <img 
@@ -290,7 +280,6 @@ const VideoSession = () => {
             </div>
           </div>
           
-          {/* Side panel (chat) on desktop */}
           <Sheet>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 flex flex-col">
               <SheetHeader className="px-4 py-3 border-b">
@@ -326,7 +315,6 @@ const VideoSession = () => {
           </Sheet>
         </div>
         
-        {/* Controls bar */}
         <div className="bg-background border-t p-3 flex items-center justify-center gap-2 md:gap-4">
           <Button 
             variant={isAudioEnabled ? "outline" : "destructive"} 
@@ -384,7 +372,6 @@ const VideoSession = () => {
         </div>
       </div>
       
-      {/* Feedback Dialog */}
       <Dialog open={isFeedbackDialogOpen} onOpenChange={setIsFeedbackDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
