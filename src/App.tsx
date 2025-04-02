@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import DashboardNavbar from "./components/DashboardNavbar";
 import Index from "./pages/Index";
@@ -21,11 +22,14 @@ import TrainerProfile from "./pages/TrainerProfile";
 import BookSession from "./pages/BookSession";
 import VideoSession from "./pages/VideoSession";
 import NotFound from "./pages/NotFound";
+import MemberProfile from "./pages/MemberProfile";
+import FavoriteTrainers from "./pages/FavoriteTrainers";
+import PaymentHistory from "./pages/PaymentHistory";
 
 // Create a new query client instance
 const queryClient = new QueryClient();
 
-// Create a layout component to handle the navbar logic
+// Auth-aware Layout component that handles the navbar logic
 const AppLayout = () => {
   const location = useLocation();
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
@@ -38,7 +42,10 @@ const AppLayout = () => {
     location.pathname.includes('/find-trainers') ||
     location.pathname.includes('/trainer-profile') ||
     location.pathname.includes('/book-session') ||
-    location.pathname.includes('/my-sessions');
+    location.pathname.includes('/my-sessions') ||
+    location.pathname.includes('/profile') ||
+    location.pathname.includes('/favorites') ||
+    location.pathname.includes('/payments');
   
   // Don't show any navbar on auth routes or video session routes
   if (isAuthRoute || isVideoSessionRoute) {
@@ -74,6 +81,9 @@ const AppRoutes = () => {
         <Route path="/book-session/:trainerId" element={<><AppLayout /><BookSession /></>} />
         <Route path="/video-session/:sessionId" element={<><AppLayout /><VideoSession /></>} />
         <Route path="/my-sessions" element={<><AppLayout /><Dashboard /></>} />
+        <Route path="/profile" element={<><AppLayout /><MemberProfile /></>} />
+        <Route path="/favorites" element={<><AppLayout /><FavoriteTrainers /></>} />
+        <Route path="/payments" element={<><AppLayout /><PaymentHistory /></>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<><AppLayout /><NotFound /></>} />
       </Routes>
@@ -90,7 +100,9 @@ const App = () => {
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
-            <AppRoutes />
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
           </TooltipProvider>
         </QueryClientProvider>
       </BrowserRouter>

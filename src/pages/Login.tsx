@@ -1,19 +1,17 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
     email: '',
@@ -35,52 +33,27 @@ const Login = () => {
   };
 
   const toggleAuthMode = () => {
-    setIsLogin(prev => !prev);
+    setIsLoginMode(prev => !prev);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Form validation
-    if ((!isLogin && !formData.firstName) || !formData.email || !formData.password) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
+    if ((!isLoginMode && !formData.firstName) || !formData.email || !formData.password) {
       return;
     }
     
     try {
-      setIsLoading(true);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Success!",
-        description: isLogin ? "You have successfully logged in." : "Your account has been created.",
-      });
-      
-      // Redirect based on user type
-      setTimeout(() => {
-        if (userType === 'trainer') {
-          navigate('/trainer-dashboard');
-        } else {
-          navigate('/dashboard');
-        }
-      }, 1000);
-      
+      if (isLoginMode) {
+        // Handle login
+        await login(formData.email, formData.password);
+      } else {
+        // Handle signup (implement this in the auth context)
+        // This would be needed in a real implementation
+      }
     } catch (error) {
-      toast({
-        title: isLogin ? "Login Failed" : "Registration Failed",
-        description: isLogin 
-          ? "Invalid email or password. Please try again." 
-          : "There was an error creating your account. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      console.error('Authentication error:', error);
     }
   };
 
@@ -112,10 +85,10 @@ const Login = () => {
               </div>
             </div>
             <h2 className="text-2xl font-bold mb-2">
-              {isLogin ? "Welcome back" : "Let's get you started"}
+              {isLoginMode ? "Welcome back" : "Let's get you started"}
             </h2>
             <p className="text-muted-foreground">
-              {isLogin ? "continue your fitness journey" : "on this fitness journey"}
+              {isLoginMode ? "continue your fitness journey" : "on this fitness journey"}
             </p>
           </div>
           
@@ -144,7 +117,7 @@ const Login = () => {
           
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* First Name Field - Only for signup */}
-            {!isLogin && (
+            {!isLoginMode && (
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <Label htmlFor="firstName">First Name <span className="text-red-500">*</span></Label>
@@ -182,7 +155,7 @@ const Login = () => {
                 <Label htmlFor="password">
                   Password <span className="text-red-500">*</span>
                 </Label>
-                {isLogin && (
+                {isLoginMode && (
                   <Link 
                     to="/forgot-password" 
                     className="text-sm font-medium text-primary hover:underline"
@@ -219,21 +192,21 @@ const Login = () => {
               disabled={isLoading}
             >
               {isLoading 
-                ? (isLogin ? 'Signing in...' : 'Creating account...') 
-                : (isLogin ? 'Login' : 'Next')}
+                ? (isLoginMode ? 'Signing in...' : 'Creating account...') 
+                : (isLoginMode ? 'Login' : 'Next')}
             </Button>
           </form>
           
           {/* Toggle between signup and login */}
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              {isLogin ? "Don't have an account?" : "Already Registered?"}{' '}
+              {isLoginMode ? "Don't have an account?" : "Already Registered?"}{' '}
               <button 
                 type="button"
                 onClick={toggleAuthMode}
                 className="font-medium text-primary hover:underline"
               >
-                {isLogin ? 'Sign up' : 'Login'}
+                {isLoginMode ? 'Sign up' : 'Login'}
               </button>
             </p>
           </div>

@@ -2,15 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Menu, X, LogOut, Bell } from 'lucide-react';
+import { Menu, X, LogOut, Bell, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { toast } = useToast();
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,14 +44,7 @@ const DashboardNavbar = () => {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    // In a real app, this would clear auth state
-    setTimeout(() => {
-      window.location.href = '/login';
-    }, 1000);
+    logout();
   };
 
   const navLinks = [
@@ -53,6 +55,12 @@ const DashboardNavbar = () => {
     { name: 'Payments', path: '/payments' },
     { name: 'Profile', path: '/profile' },
   ];
+
+  // Get user initials for avatar fallback
+  const getInitials = () => {
+    if (!user?.name) return 'U';
+    return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
 
   return (
     <header
@@ -110,15 +118,48 @@ const DashboardNavbar = () => {
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="ml-2 hover-lift"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-1 h-4 w-4" />
-              Logout
-            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="ml-2 gap-2 hover-lift">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
+                    <AvatarFallback>{getInitials()}</AvatarFallback>
+                  </Avatar>
+                  <span className="font-medium hidden md:inline-block">{user?.name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" className="cursor-pointer">
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/favorites" className="cursor-pointer">
+                    Favorite Trainers
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/payments" className="cursor-pointer">
+                    Payment History
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile menu button */}
@@ -149,6 +190,20 @@ const DashboardNavbar = () => {
         )}
       >
         <div className="px-4 pt-2 pb-4 bg-white dark:bg-black">
+          {/* User info in mobile menu */}
+          {user && (
+            <div className="flex items-center space-x-3 px-3 py-2 mb-2 border-b border-border">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback>{getInitials()}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium">{user.name}</p>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+              </div>
+            </div>
+          )}
+          
           <div className="space-y-1">
             {navLinks.map((link) => (
               <Link

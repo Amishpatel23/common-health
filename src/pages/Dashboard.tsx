@@ -1,9 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-// Remove the DashboardNavbar import since we'll use the global navbar
-// import DashboardNavbar from '@/components/DashboardNavbar';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import OverviewCard from '@/components/dashboard/OverviewCard';
 import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
@@ -12,8 +9,10 @@ import RecentChatsList from '@/components/dashboard/RecentChatsList';
 import UpcomingSessionsTable from '@/components/dashboard/UpcomingSessionsTable';
 import { Calendar, Clock, Users, CreditCard, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
-// Mock data
+// Mock data - in a real app, this would come from API
 const mockUpcomingSessions = [
   {
     id: '1',
@@ -109,7 +108,7 @@ const mockRecentChats = [
 ];
 
 const Dashboard = () => {
-  const [userName, setUserName] = useState('Sarah');
+  const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -139,7 +138,7 @@ const Dashboard = () => {
       title: "Joining session",
       description: "Connecting to video session...",
     });
-    // In a real app, this would navigate to a video room
+    navigate(`/video-session/${sessionId}`);
   };
   
   const handleRescheduleSession = (sessionId: string) => {
@@ -163,12 +162,13 @@ const Dashboard = () => {
     navigate('/chat');
   };
   
+  // Display the user's first name if available
+  const firstName = user?.name ? user.name.split(' ')[0] : 'there';
+  
   // Loading skeleton
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        {/* Remove the DashboardNavbar from here */}
-        
         <div className="flex-1 pt-16 lg:pl-64">
           <DashboardSidebar />
           
@@ -206,8 +206,6 @@ const Dashboard = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Remove the DashboardNavbar from here */}
-      
       <div className="flex-1 pt-16 lg:pl-64">
         <DashboardSidebar />
         
@@ -220,7 +218,7 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <h1 className="text-2xl sm:text-3xl font-bold">
-                Welcome back, {userName}!
+                Welcome back, {firstName}!
               </h1>
               <p className="text-muted-foreground mt-1">
                 Here's what's happening with your fitness journey today.
@@ -269,8 +267,8 @@ const Dashboard = () => {
             <div className="animate-fade-in" style={{ animationDelay: '600ms' }}>
               <OverviewCard
                 title="Subscription"
-                value="Premium"
-                description="Renews on Jul 15, 2023"
+                value={user?.membershipDetails?.plan || "Basic"}
+                description={`Renews on ${user?.membershipDetails?.endDate || 'N/A'}`}
                 icon={<CreditCard className="h-5 w-5" />}
                 className="hover-lift"
               />
