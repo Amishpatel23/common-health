@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '@/components/TrainerDashboardNavbar';
 import DashboardSidebar from '@/components/TrainerDashboardSidebar';
 import OverviewCard from '@/components/dashboard/OverviewCard';
+import ActiveSessionBanner from '@/components/trainer/ActiveSessionBanner';
 import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
 import SessionRequestsTable from '@/components/trainer/SessionRequestsTable';
 import UpcomingSessionsTable from '@/components/dashboard/UpcomingSessionsTable';
@@ -101,19 +101,34 @@ const mockRecentChats = [
   },
 ];
 
+// Mock active session data
+const mockActiveSession = {
+  id: '1',
+  memberName: 'Emily Wilson',
+  sessionType: 'HIIT Training',
+  startTime: '2:00 PM',
+};
+
 const TrainerDashboard = () => {
   const [trainerName, setTrainerName] = useState('Alex');
   const [availabilityStatus, setAvailabilityStatus] = useState('Available');
+  const [hasActiveSession, setHasActiveSession] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   
   // Simulate loading state
   const [isLoading, setIsLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   
   useEffect(() => {
     // Simulate API fetch delay
     const timer = setTimeout(() => {
       setIsLoading(false);
+      
+      // Add a small delay before showing content animation
+      setTimeout(() => {
+        setContentLoaded(true);
+      }, 100);
     }, 1000);
     
     return () => clearTimeout(timer);
@@ -129,7 +144,7 @@ const TrainerDashboard = () => {
       title: "Starting session",
       description: "Preparing video session...",
     });
-    // In a real app, this would navigate to a video room
+    navigate(`/video-session/${sessionId}`);
   };
   
   const handleRescheduleSession = (sessionId: string) => {
@@ -174,6 +189,42 @@ const TrainerDashboard = () => {
     navigate('/manage-availability');
   };
   
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <DashboardNavbar />
+        
+        <div className="flex-1 pt-16 lg:pl-64">
+          <DashboardSidebar />
+          
+          <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+            {/* Loading skeleton UI */}
+            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-bold">
+                    Welcome back, {trainerName}!
+                  </h1>
+                  <p className="text-muted-foreground mt-1">
+                    Here's an overview of your training business.
+                  </p>
+                </div>
+                <Button 
+                  className="shrink-0 animate-fade-in" 
+                  style={{ animationDelay: '200ms' }}
+                  onClick={handleUpdateAvailability}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  Update Availability
+                </Button>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen flex flex-col">
       <DashboardNavbar />
@@ -182,10 +233,21 @@ const TrainerDashboard = () => {
         {/* Sidebar (desktop-only) */}
         <DashboardSidebar />
         
-        <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+        <main 
+          className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 ${
+            contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          } transition-all duration-500`}
+        >
+          {/* Active Session Banner */}
+          {hasActiveSession && (
+            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <ActiveSessionBanner session={mockActiveSession} />
+            </div>
+          )}
+          
           {/* Welcome message */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
+            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <h1 className="text-2xl sm:text-3xl font-bold">
                 Welcome back, {trainerName}!
               </h1>
@@ -193,7 +255,11 @@ const TrainerDashboard = () => {
                 Here's an overview of your training business.
               </p>
             </div>
-            <Button className="shrink-0" onClick={handleUpdateAvailability}>
+            <Button 
+              className="shrink-0 animate-fade-in" 
+              style={{ animationDelay: '200ms' }}
+              onClick={handleUpdateAvailability}
+            >
               <CalendarIcon className="mr-2 h-4 w-4" />
               Update Availability
             </Button>
@@ -201,14 +267,16 @@ const TrainerDashboard = () => {
           
           {/* Overview cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <OverviewCard
-              title="Next Session"
-              value="Today at 2:00 PM"
-              description="HIIT with Emily Wilson"
-              icon={<Calendar className="h-5 w-5" />}
-              onClick={() => handleStartSession('1')}
-              className="cursor-pointer hover:border-primary/50"
-            />
+            <div className="animate-fade-in" style={{ animationDelay: '300ms' }}>
+              <OverviewCard
+                title="Next Session"
+                value="Today at 2:00 PM"
+                description="HIIT with Emily Wilson"
+                icon={<Calendar className="h-5 w-5" />}
+                onClick={() => handleStartSession('1')}
+                className="cursor-pointer hover:border-primary/50 hover-lift"
+              />
+            </div>
             <OverviewCard
               title="Total Sessions"
               value="42"
@@ -227,14 +295,14 @@ const TrainerDashboard = () => {
               description="Next available: Today, 5PM-8PM"
               icon={<Users className="h-5 w-5" />}
               onClick={handleUpdateAvailability}
-              className="cursor-pointer hover:border-primary/50"
+              className="cursor-pointer hover:border-primary/50 hover-lift"
             />
           </div>
           
           {/* Main content grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left column - Session requests and upcoming sessions */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '700ms' }}>
               {/* Session Requests */}
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -294,7 +362,7 @@ const TrainerDashboard = () => {
             </div>
             
             {/* Right column - Recent chats and availability widget */}
-            <div className="space-y-6">
+            <div className="space-y-6 animate-fade-in" style={{ animationDelay: '800ms' }}>
               {/* Recent Chats */}
               <div>
                 <h2 className="text-xl font-semibold mb-4">Recent Chats</h2>

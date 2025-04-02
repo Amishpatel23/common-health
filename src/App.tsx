@@ -18,6 +18,7 @@ import Chat from "./pages/Chat";
 import FindTrainers from "./pages/FindTrainers";
 import TrainerProfile from "./pages/TrainerProfile";
 import BookSession from "./pages/BookSession";
+import VideoSession from "./pages/VideoSession";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const queryClient = new QueryClient();
 const AppLayout = () => {
   const location = useLocation();
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
+  const isVideoSessionRoute = location.pathname.includes('/video-session');
   const isDashboardRoute = 
     location.pathname.includes('/dashboard') || 
     location.pathname.includes('/trainer-dashboard') || 
@@ -36,8 +38,8 @@ const AppLayout = () => {
     location.pathname.includes('/book-session') ||
     location.pathname.includes('/my-sessions');
   
-  // Don't show any navbar on auth routes
-  if (isAuthRoute) {
+  // Don't show any navbar on auth routes or video session routes
+  if (isAuthRoute || isVideoSessionRoute) {
     return null;
   }
   
@@ -70,6 +72,7 @@ const App = () => (
           <Route path="/trainers" element={<><AppLayout /><FindTrainers /></>} />
           <Route path="/trainer-profile/:trainerId" element={<><AppLayout /><TrainerProfile /></>} />
           <Route path="/book-session/:trainerId" element={<><AppLayout /><BookSession /></>} />
+          <Route path="/video-session/:sessionId" element={<><AppLayout /><VideoSession /></>} />
           <Route path="/my-sessions" element={<><AppLayout /><Dashboard /></>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<><AppLayout /><NotFound /></>} />
