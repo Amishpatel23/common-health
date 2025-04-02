@@ -1,9 +1,22 @@
 
 import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Phone, Video, MoreVertical, ChevronLeft } from 'lucide-react';
+import { Phone, Video, MoreVertical, ChevronLeft, Check, Clock, Info } from 'lucide-react';
 import MessageInput from './MessageInput';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ChatContact {
   id: string;
@@ -19,6 +32,10 @@ interface Message {
   text: string;
   time: string;
   date: string;
+  status?: 'sent' | 'delivered' | 'read' | 'pending';
+  type?: 'text' | 'image' | 'voice' | 'file';
+  content?: string;
+  duration?: number;
 }
 
 interface ChatConversationProps {
@@ -43,10 +60,53 @@ const ChatConversation = ({ contact, messages, onSendMessage }: ChatConversation
     groupedMessages[message.date].push(message);
   });
   
+  // Helper function to render message status icon
+  const renderMessageStatus = (status?: string) => {
+    switch (status) {
+      case 'sent':
+        return <Check className="h-3 w-3 text-muted-foreground" />;
+      case 'delivered':
+        return <Check className="h-3 w-3 text-muted-foreground" />;
+      case 'read':
+        return (
+          <div className="flex">
+            <Check className="h-3 w-3 text-primary" />
+            <Check className="h-3 w-3 -ml-1 text-primary" />
+          </div>
+        );
+      case 'pending':
+        return <Clock className="h-3 w-3 text-muted-foreground" />;
+      default:
+        return null;
+    }
+  };
+  
+  // Process messages to add status
+  const processedMessages = messages.map(message => {
+    if (message.senderId === 'current-user' && !message.status) {
+      // Add random status for demo purposes
+      const statuses = ['sent', 'delivered', 'read', 'pending'];
+      return {
+        ...message,
+        status: statuses[Math.floor(Math.random() * statuses.length)] as 'sent' | 'delivered' | 'read' | 'pending'
+      };
+    }
+    return message;
+  });
+  
+  // Re-group processed messages
+  const processedGroupedMessages: { [key: string]: Message[] } = {};
+  processedMessages.forEach(message => {
+    if (!processedGroupedMessages[message.date]) {
+      processedGroupedMessages[message.date] = [];
+    }
+    processedGroupedMessages[message.date].push(message);
+  });
+  
   return (
     <div className="flex-1 flex flex-col bg-secondary/10">
       {/* Chat Header */}
-      <div className="py-3 px-4 border-b border-border bg-background flex items-center justify-between shadow-sm">
+      <div className="py-3 px-4 border-b border-border bg-background flex items-center justify-between shadow-sm backdrop-blur-sm bg-background/90 sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
@@ -55,11 +115,11 @@ const ChatConversation = ({ contact, messages, onSendMessage }: ChatConversation
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <div className="relative">
+          <div className="relative group">
             <img
               src={contact.avatar}
               alt={contact.name}
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-background"
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-background transition-all duration-300 group-hover:ring-primary/20"
             />
             {contact.isOnline && (
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></span>
@@ -82,21 +142,56 @@ const ChatConversation = ({ contact, messages, onSendMessage }: ChatConversation
         </div>
         
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-secondary text-primary/80 hover:text-primary" aria-label="Voice call">
-            <Phone className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-secondary text-primary/80 hover:text-primary" aria-label="Video call">
-            <Video className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-secondary" aria-label="More options">
-            <MoreVertical className="w-4 h-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full hover:bg-secondary text-primary/80 hover:text-primary transition-colors" 
+                aria-label="Voice call"
+              >
+                <Phone className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Voice call</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full hover:bg-secondary text-primary/80 hover:text-primary transition-colors" 
+                aria-label="Video call"
+              >
+                <Video className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Video call</TooltipContent>
+          </Tooltip>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-secondary" aria-label="More options">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Chat options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>View contact info</DropdownMenuItem>
+              <DropdownMenuItem>Search in conversation</DropdownMenuItem>
+              <DropdownMenuItem>Mute notifications</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive">Block contact</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-gradient-to-b from-secondary/5 to-secondary/20">
-        {Object.entries(groupedMessages).map(([date, dateMessages]) => (
+        {Object.entries(processedGroupedMessages).map(([date, dateMessages]) => (
           <div key={date} className="space-y-4">
             <div className="flex items-center justify-center">
               <span className="text-xs font-medium text-muted-foreground bg-background/80 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">
@@ -132,21 +227,22 @@ const ChatConversation = ({ contact, messages, onSendMessage }: ChatConversation
                   
                   <div 
                     className={cn(
-                      "max-w-[75%] rounded-2xl px-4 py-2 shadow-sm",
+                      "max-w-[75%] rounded-2xl px-4 py-2 shadow-sm transition-all hover:shadow-md",
                       isCurrentUser 
                         ? "bg-primary text-primary-foreground rounded-br-sm" 
                         : "bg-white dark:bg-black/60 rounded-bl-sm"
                     )}
                   >
                     <p className="break-words">{message.text}</p>
-                    <span 
+                    <div 
                       className={cn(
-                        "text-xs block text-right mt-1",
+                        "text-xs flex items-center justify-end mt-1 gap-1",
                         isCurrentUser ? "text-primary-foreground/80" : "text-muted-foreground"
                       )}
                     >
-                      {message.time}
-                    </span>
+                      <span>{message.time}</span>
+                      {isCurrentUser && renderMessageStatus(message.status)}
+                    </div>
                   </div>
                 </div>
               );
