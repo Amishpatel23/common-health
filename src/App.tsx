@@ -52,33 +52,42 @@ const AppLayout = () => {
   return <Navbar />;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+// Main app component
+const AppRoutes = () => {
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<><AppLayout /><Index /></>} />
+        <Route path="/how-it-works" element={<><AppLayout /><HowItWorks /></>} />
+        <Route path="/contact" element={<><AppLayout /><Contact /></>} />
+        <Route path="/login" element={<><AppLayout /><Login /></>} />
+        <Route path="/signup" element={<><AppLayout /><Signup /></>} />
+        <Route path="/dashboard" element={<><AppLayout /><Dashboard /></>} />
+        <Route path="/trainer-dashboard" element={<><AppLayout /><TrainerDashboard /></>} />
+        <Route path="/admin" element={<><AppLayout /><AdminPanel /></>} />
+        <Route path="/chat" element={<><AppLayout /><Chat /></>} />
+        <Route path="/find-trainers" element={<><AppLayout /><FindTrainers /></>} />
+        <Route path="/trainers" element={<><AppLayout /><FindTrainers /></>} />
+        <Route path="/trainer-profile/:trainerId" element={<><AppLayout /><TrainerProfile /></>} />
+        <Route path="/book-session/:trainerId" element={<><AppLayout /><BookSession /></>} />
+        <Route path="/video-session/:sessionId" element={<><AppLayout /><VideoSession /></>} />
+        <Route path="/my-sessions" element={<><AppLayout /><Dashboard /></>} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<><AppLayout /><NotFound /></>} />
+      </Routes>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<><AppLayout /><Index /></>} />
-          <Route path="/how-it-works" element={<><AppLayout /><HowItWorks /></>} />
-          <Route path="/contact" element={<><AppLayout /><Contact /></>} />
-          <Route path="/login" element={<><AppLayout /><Login /></>} />
-          <Route path="/signup" element={<><AppLayout /><Signup /></>} />
-          <Route path="/dashboard" element={<><AppLayout /><Dashboard /></>} />
-          <Route path="/trainer-dashboard" element={<><AppLayout /><TrainerDashboard /></>} />
-          <Route path="/admin" element={<><AppLayout /><AdminPanel /></>} />
-          <Route path="/chat" element={<><AppLayout /><Chat /></>} />
-          <Route path="/find-trainers" element={<><AppLayout /><FindTrainers /></>} />
-          <Route path="/trainers" element={<><AppLayout /><FindTrainers /></>} />
-          <Route path="/trainer-profile/:trainerId" element={<><AppLayout /><TrainerProfile /></>} />
-          <Route path="/book-session/:trainerId" element={<><AppLayout /><BookSession /></>} />
-          <Route path="/video-session/:sessionId" element={<><AppLayout /><VideoSession /></>} />
-          <Route path="/my-sessions" element={<><AppLayout /><Dashboard /></>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<><AppLayout /><NotFound /></>} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    </>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <TooltipProvider>
+        <AppRoutes />
+      </TooltipProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
