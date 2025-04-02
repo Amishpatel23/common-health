@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +22,7 @@ import BookSession from "./pages/BookSession";
 import VideoSession from "./pages/VideoSession";
 import NotFound from "./pages/NotFound";
 
+// Create a new query client instance
 const queryClient = new QueryClient();
 
 // Create a layout component to handle the navbar logic
@@ -52,7 +54,7 @@ const AppLayout = () => {
   return <Navbar />;
 };
 
-// Main app component
+// Main app component with routes
 const AppRoutes = () => {
   return (
     <>
@@ -81,14 +83,19 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider>
-        <AppRoutes />
-      </TooltipProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+// Root app component with all providers
+const App = () => {
+  return (
+    <React.StrictMode>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <AppRoutes />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+  );
+};
 
 export default App;
