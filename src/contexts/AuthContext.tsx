@@ -27,6 +27,8 @@ interface AuthContextType {
   signup: (userData: { firstName: string, email: string, password: string, role: 'member' | 'trainer' }) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (token: string, newPassword: string) => Promise<void>;
 }
 
 // Create context
@@ -87,6 +89,22 @@ const mockApiCall = async (endpoint: string, data: any): Promise<any> => {
         },
       },
       token: 'mock-jwt-token',
+    };
+  }
+
+  if (endpoint === '/api/auth/forgot-password') {
+    // Mock password reset request
+    return {
+      success: true,
+      message: 'Password reset email sent successfully',
+    };
+  }
+
+  if (endpoint === '/api/auth/reset-password') {
+    // Mock password reset
+    return {
+      success: true,
+      message: 'Password reset successfully',
     };
   }
   
@@ -214,6 +232,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     navigate('/login');
   };
+
+  // Request password reset function
+  const requestPasswordReset = async (email: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await mockApiCall('/api/auth/forgot-password', { email });
+      // No need to update state, just show success message
+      toast({
+        description: "If an account exists with that email, you'll receive reset instructions",
+      });
+    } catch (err: any) {
+      setError(err.message || 'Failed to request password reset');
+      toast({
+        title: "Failed to request password reset",
+        description: err.message || 'Please try again later',
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset password function
+  const resetPassword = async (token: string, newPassword: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await mockApiCall('/api/auth/reset-password', { token, newPassword });
+      toast({
+        description: "Your password has been reset successfully",
+      });
+    } catch (err: any) {
+      setError(err.message || 'Failed to reset password');
+      toast({
+        title: "Failed to reset password",
+        description: err.message || 'Invalid or expired token',
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const value = {
     user,
@@ -223,6 +286,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signup,
     logout,
     isAuthenticated: !!user,
+    requestPasswordReset,
+    resetPassword,
   };
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

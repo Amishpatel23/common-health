@@ -13,6 +13,8 @@ import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import TrainerDashboard from "./pages/TrainerDashboard";
 import AdminPanel from "./pages/AdminPanel";
@@ -32,7 +34,10 @@ const queryClient = new QueryClient();
 // Auth-aware Layout component that handles the navbar logic
 const AppLayout = () => {
   const location = useLocation();
-  const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
+  const isAuthRoute = location.pathname === '/login' || 
+                      location.pathname === '/signup' || 
+                      location.pathname === '/forgot-password' || 
+                      location.pathname.includes('/reset-password');
   const isVideoSessionRoute = location.pathname.includes('/video-session');
   const isDashboardRoute = 
     location.pathname.includes('/dashboard') || 
@@ -71,6 +76,8 @@ const AppRoutes = () => {
         <Route path="/contact" element={<><AppLayout /><Contact /></>} />
         <Route path="/login" element={<><AppLayout /><Login /></>} />
         <Route path="/signup" element={<><AppLayout /><Signup /></>} />
+        <Route path="/forgot-password" element={<><AppLayout /><ForgotPassword /></>} />
+        <Route path="/reset-password/:token" element={<><AppLayout /><ResetPassword /></>} />
         <Route path="/dashboard" element={<><AppLayout /><Dashboard /></>} />
         <Route path="/trainer-dashboard" element={<><AppLayout /><TrainerDashboard /></>} />
         <Route path="/admin" element={<><AppLayout /><AdminPanel /></>} />
