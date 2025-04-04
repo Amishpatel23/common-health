@@ -30,7 +30,7 @@ const steps = [
   },
 ];
 
-const HowItWorks = () => {
+const HowItWorksSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -108,4 +108,4 @@ const HowItWorks = () => {
   );
 };
 
-export default HowItWorks;
+export default HowItWorksSection;

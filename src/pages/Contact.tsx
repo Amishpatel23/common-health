@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import Navbar from '@/components/Navbar';
+// Remove Navbar import since it's handled in App.tsx
 import Footer from '@/components/Footer';
 import ContactForm from '@/components/ContactForm';
 
@@ -12,7 +12,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      {/* Removed Navbar since it's handled by AppLayout in App.tsx */}
       <main>
         {/* Page header */}
         <section className="pt-20 pb-16 bg-secondary/50">

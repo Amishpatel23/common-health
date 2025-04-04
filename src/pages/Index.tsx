@@ -1,9 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-// Remove the Navbar import since we're handling it in App.tsx
-// import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
-import HowItWorks from '@/components/HowItWorks';
+import HowItWorksSection from '@/components/HowItWorks';
 import TrainerShowcase from '@/components/TrainerShowcase';
 import Testimonials from '@/components/Testimonials';
 import CTABanner from '@/components/CTABanner';
@@ -26,10 +24,9 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-      {/* Remove the Navbar from here */}
       <main>
         <Hero />
-        <HowItWorks />
+        <HowItWorksSection />
         <TrainerShowcase />
         <Testimonials />
         <CTABanner />

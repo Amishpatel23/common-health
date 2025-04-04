@@ -1,11 +1,8 @@
-
 import React, { useEffect } from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CTABanner from '@/components/CTABanner';
-import HowItWorks from '@/components/HowItWorks';
+import HowItWorksSection from '@/components/HowItWorks';
 import { ArrowRight, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -50,7 +47,6 @@ const HowItWorksPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main>
         {/* Hero Section */}
         <section className="pt-20 pb-16 bg-secondary/50">
@@ -70,7 +66,7 @@ const HowItWorksPage = () => {
 
         {/* Process Section */}
         <div className="bg-white">
-          <HowItWorks />
+          <HowItWorksSection />
         </div>
 
         {/* Feature Comparison */}
