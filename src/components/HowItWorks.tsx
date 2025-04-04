@@ -32,24 +32,47 @@ const steps = [
 
 const HowItWorksSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-
+  
   useEffect(() => {
+    // Improved intersection observer with better thresholds
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('animate-slide-up');
+            // Find all elements with data-animate attribute
+            const elements = entry.target.querySelectorAll('[data-animate]');
+            
+            // Add animation classes with proper delays
+            elements.forEach((el) => {
+              el.classList.add('animate-slide-up');
+              
+              // Force a reflow to ensure animations trigger properly
+              el.getBoundingClientRect();
+            });
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -10% 0px' }
+      { 
+        threshold: [0.1, 0.2, 0.3], // Multiple thresholds for better detection
+        rootMargin: '0px 0px -5% 0px' // Adjusted root margin
+      }
     );
 
-    const elements = sectionRef.current?.querySelectorAll('[data-animate]');
-    elements?.forEach((el) => observer.observe(el));
+    // Observe the section container
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+      
+      // Immediately add visibility classes to fix partial loading
+      const elements = sectionRef.current.querySelectorAll('[data-animate]');
+      elements.forEach((el) => {
+        el.classList.add('opacity-0');
+      });
+    }
 
     return () => {
-      elements?.forEach((el) => observer.unobserve(el));
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
     };
   }, []);
 

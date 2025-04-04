@@ -34,22 +34,52 @@ const Testimonials = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Improved animation handling
+    const triggerAnimations = () => {
+      if (!sectionRef.current) return;
+      
+      const elements = sectionRef.current.querySelectorAll('[data-animate]');
+      
+      // Ensure initial state
+      elements.forEach(el => {
+        el.classList.add('opacity-0');
+      });
+      
+      // Trigger animations with delay
+      setTimeout(() => {
+        elements.forEach(el => {
+          el.classList.add('animate-slide-up');
+        });
+      }, 100);
+    };
+    
+    // Enhanced intersection observer
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('animate-slide-up');
+            triggerAnimations();
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { 
+        threshold: [0.1, 0.2, 0.3],
+        rootMargin: '0px 0px -10% 0px' 
+      }
     );
 
-    const elements = sectionRef.current?.querySelectorAll('[data-animate]');
-    elements?.forEach((el) => observer.observe(el));
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+      
+      // Also trigger animations directly for reliability
+      triggerAnimations();
+    }
 
     return () => {
-      elements?.forEach((el) => observer.unobserve(el));
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
     };
   }, []);
 

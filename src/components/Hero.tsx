@@ -9,27 +9,49 @@ const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Enhanced animation handling
+    const handleAnimation = () => {
+      if (!containerRef.current) return;
+      
+      const animatedElements = containerRef.current.querySelectorAll('[data-animate]');
+      
+      // Force initial opacity to ensure proper transitions
+      animatedElements.forEach((el) => {
+        el.classList.add('opacity-0');
+      });
+      
+      // Add animation classes with proper delay sequence
+      setTimeout(() => {
+        animatedElements.forEach((el, index) => {
+          setTimeout(() => {
+            el.classList.add('animate-fade-in');
+          }, index * 150);
+        });
+      }, 100);
+    };
+
+    // Use both intersection observer and direct animation for reliability
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          const animatedElements = entry.target.querySelectorAll('[data-animate]');
-          animatedElements.forEach((el, index) => {
-            setTimeout(() => {
-              el.classList.add('animate-fade-in');
-            }, index * 150);
-          });
+          handleAnimation();
+          // Once triggered, we can disconnect the observer
+          observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '0px 0px -5% 0px' }
     );
 
     if (containerRef.current) {
       observer.observe(containerRef.current);
+      
+      // Also trigger animation directly to ensure it happens
+      handleAnimation();
     }
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (observer) {
+        observer.disconnect();
       }
     };
   }, []);

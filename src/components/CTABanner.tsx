@@ -9,24 +9,43 @@ const CTABanner = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Improved animation handling
+    const handleAnimation = () => {
+      if (!containerRef.current) return;
+      
+      const animatedElements = containerRef.current.querySelectorAll('[data-animate]');
+      
+      // Set initial state
+      animatedElements.forEach(el => {
+        el.classList.add('opacity-0');
+      });
+      
+      // Trigger animations
+      setTimeout(() => {
+        animatedElements.forEach(el => {
+          el.classList.add('animate-fade-in');
+        });
+      }, 100);
+    };
+    
+    // Enhanced intersection observer
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const animatedElements = entry.target.querySelectorAll('[data-animate]');
-            animatedElements.forEach((el, index) => {
-              setTimeout(() => {
-                el.classList.add('animate-fade-in');
-              }, index * 150);
-            });
+            handleAnimation();
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '0px 0px -10% 0px' }
     );
 
     if (containerRef.current) {
       observer.observe(containerRef.current);
+      
+      // Also trigger animation directly for reliability
+      handleAnimation();
     }
 
     return () => {
