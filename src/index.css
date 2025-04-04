@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -81,6 +82,16 @@
   
   section [data-animate] {
     animation: fade-in 0.5s ease-in-out forwards 0.5s !important;
+  }
+}
+
+@layer components {
+  .auth-input {
+    @apply h-11 rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  .auth-button {
+    @apply h-11 w-full font-medium text-white rounded-md bg-red-600 hover:bg-red-700 transition-colors duration-200;
   }
 }
 
