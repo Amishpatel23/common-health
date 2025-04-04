@@ -34,45 +34,67 @@ const HowItWorksSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Improved intersection observer with better thresholds
+    // Enhanced approach to guarantee animations trigger
+    const triggerAnimations = () => {
+      if (!sectionRef.current) return;
+      
+      // Find all elements with data-animate attribute
+      const elements = sectionRef.current.querySelectorAll('[data-animate]');
+      
+      // Ensure initial state for proper animation
+      elements.forEach(el => {
+        el.classList.add('opacity-0');
+        // Force reflow
+        el.getBoundingClientRect();
+      });
+      
+      // Trigger animations with slight delay for better browser rendering
+      setTimeout(() => {
+        elements.forEach((el, index) => {
+          setTimeout(() => {
+            el.classList.add('animate-slide-up');
+            // Force reflow again to ensure animation triggers
+            el.getBoundingClientRect();
+          }, index * 100);
+        });
+      }, 100);
+    };
+    
+    // Multiple approaches for maximum reliability
+    
+    // 1. Direct trigger on component mount
+    triggerAnimations();
+    
+    // 2. Enhanced intersection observer with multiple thresholds
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Find all elements with data-animate attribute
-            const elements = entry.target.querySelectorAll('[data-animate]');
-            
-            // Add animation classes with proper delays
-            elements.forEach((el) => {
-              el.classList.add('animate-slide-up');
-              
-              // Force a reflow to ensure animations trigger properly
-              el.getBoundingClientRect();
-            });
+            triggerAnimations();
+            observer.unobserve(entry.target);
           }
         });
       },
       { 
-        threshold: [0.1, 0.2, 0.3], // Multiple thresholds for better detection
+        threshold: [0.1, 0.2, 0.3, 0.4, 0.5], // Multiple thresholds for better detection
         rootMargin: '0px 0px -5% 0px' // Adjusted root margin
       }
     );
 
-    // Observe the section container
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
-      
-      // Immediately add visibility classes to fix partial loading
-      const elements = sectionRef.current.querySelectorAll('[data-animate]');
-      elements.forEach((el) => {
-        el.classList.add('opacity-0');
-      });
     }
+    
+    // 3. Backup timer to ensure animation happens regardless
+    const backupTimer = setTimeout(() => {
+      triggerAnimations();
+    }, 1000);
 
     return () => {
       if (sectionRef.current) {
         observer.unobserve(sectionRef.current);
       }
+      clearTimeout(backupTimer);
     };
   }, []);
 

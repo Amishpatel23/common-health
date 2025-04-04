@@ -9,7 +9,7 @@ const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Enhanced animation handling
+    // Enhanced animation handling with improved reliability
     const handleAnimation = () => {
       if (!containerRef.current) return;
       
@@ -21,38 +21,49 @@ const Hero = () => {
       });
       
       // Add animation classes with proper delay sequence
+      // Use a more reliable approach with guaranteed animation
       setTimeout(() => {
         animatedElements.forEach((el, index) => {
+          // Staggered animation for smoother appearance
           setTimeout(() => {
             el.classList.add('animate-fade-in');
+            // Force reflow to guarantee animation triggers
+            el.getBoundingClientRect();
           }, index * 150);
         });
       }, 100);
     };
 
-    // Use both intersection observer and direct animation for reliability
+    // Multiple approaches for maximum reliability
+    // 1. Direct trigger for immediate animation
+    handleAnimation();
+    
+    // 2. Use both intersection observer for scroll-triggered animation
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           handleAnimation();
-          // Once triggered, we can disconnect the observer
+          // Once triggered, disconnect the observer
           observer.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -5% 0px' }
+      { threshold: [0.1, 0.2, 0.3], rootMargin: '0px 0px -5% 0px' }
     );
 
     if (containerRef.current) {
       observer.observe(containerRef.current);
-      
-      // Also trigger animation directly to ensure it happens
-      handleAnimation();
     }
+
+    // 3. Backup timeout to ensure animation happens regardless
+    const backupTimer = setTimeout(() => {
+      handleAnimation();
+    }, 500);
 
     return () => {
       if (observer) {
         observer.disconnect();
       }
+      clearTimeout(backupTimer);
     };
   }, []);
 

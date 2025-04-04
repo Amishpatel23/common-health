@@ -10,28 +10,35 @@ import Footer from '@/components/Footer';
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Scroll to top on page load and ensure content is fully visible
+  // Improved page loading with guaranteed visibility
   useEffect(() => {
+    // Scroll to top on page load
     window.scrollTo(0, 0);
     
-    // Ensure page is fully loaded
-    setIsLoaded(true);
-    
-    // Force a reflow to ensure animations trigger properly
-    const forceReflow = () => {
+    // Add a small delay to ensure DOM is ready before animations
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+      
+      // Force a reflow to ensure animations trigger properly
       document.body.getBoundingClientRect();
-    };
+      
+      // Additional technique to ensure visibility
+      const sections = document.querySelectorAll('section');
+      sections.forEach(section => {
+        section.classList.add('section-visible');
+      });
+    }, 100);
     
-    forceReflow();
-    
-    // Cleanup function
     return () => {
-      // Reset any animations if needed
+      clearTimeout(timer);
     };
   }, []);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
+    <div 
+      className={`min-h-screen flex flex-col ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
+      style={{ visibility: isLoaded ? 'visible' : 'hidden' }}
+    >
       <main>
         <Hero />
         <HowItWorksSection />

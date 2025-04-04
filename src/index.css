@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -74,6 +73,15 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  section {
+    opacity: 1 !important;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  section [data-animate] {
+    animation: fade-in 0.5s ease-in-out forwards 0.5s !important;
+  }
 }
 
 @layer utilities {
@@ -116,6 +124,7 @@
   .animate-fade-in {
     opacity: 0;
     animation: fade-in 0.5s ease forwards;
+    animation-fill-mode: forwards !important;
   }
   
   @keyframes fade-in {
@@ -134,6 +143,27 @@
     }
     50% {
       opacity: 0.7;
+    }
+  }
+  
+  .section-visible {
+    opacity: 1 !important;
+  }
+  
+  .animate-slide-up {
+    opacity: 0;
+    animation: slide-up 0.5s ease forwards;
+    animation-fill-mode: forwards !important;
+  }
+  
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
