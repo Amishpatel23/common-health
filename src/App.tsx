@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-route
 import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import DashboardNavbar from "./components/DashboardNavbar";
+import TrainerDashboardNavbar from "./components/TrainerDashboardNavbar";
 import Index from "./pages/Index";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/Contact";
@@ -27,6 +28,8 @@ import NotFound from "./pages/NotFound";
 import MemberProfile from "./pages/MemberProfile";
 import FavoriteTrainers from "./pages/FavoriteTrainers";
 import PaymentHistory from "./pages/PaymentHistory";
+import TrainerEarnings from "./pages/TrainerEarnings";
+import ManageAvailability from "./pages/ManageAvailability";
 import { useAuth } from "./contexts/AuthContext";
 
 // Create a new query client instance
@@ -73,9 +76,13 @@ const AppLayout = () => {
                       location.pathname === '/forgot-password' || 
                       location.pathname.includes('/reset-password');
   const isVideoSessionRoute = location.pathname.includes('/video-session');
+  const isTrainerRoute = 
+    location.pathname.includes('/trainer-dashboard') || 
+    location.pathname.includes('/manage-availability') ||
+    location.pathname.includes('/earnings');
   const isDashboardRoute = 
     location.pathname.includes('/dashboard') || 
-    location.pathname.includes('/trainer-dashboard') || 
+    isTrainerRoute ||
     location.pathname.includes('/admin') ||
     location.pathname.includes('/chat') ||
     location.pathname.includes('/find-trainers') ||
@@ -89,6 +96,11 @@ const AppLayout = () => {
   // Don't show any navbar on auth routes or video session routes
   if (isAuthRoute || isVideoSessionRoute) {
     return null;
+  }
+  
+  // Show trainer dashboard navbar for trainer routes
+  if (isTrainerRoute && isAuthenticated && user?.role === 'trainer') {
+    return <TrainerDashboardNavbar />;
   }
   
   // Show dashboard navbar on dashboard routes when authenticated
@@ -161,6 +173,16 @@ const AppRoutes = () => {
         <Route path="/trainer-dashboard" element={
           <ProtectedRoute allowedRoles={['trainer']}>
             <TrainerDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/earnings" element={
+          <ProtectedRoute allowedRoles={['trainer']}>
+            <TrainerEarnings />
+          </ProtectedRoute>
+        } />
+        <Route path="/manage-availability" element={
+          <ProtectedRoute allowedRoles={['trainer']}>
+            <ManageAvailability />
           </ProtectedRoute>
         } />
         

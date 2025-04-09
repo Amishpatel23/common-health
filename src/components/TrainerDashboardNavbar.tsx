@@ -5,12 +5,14 @@ import { cn } from '@/lib/utils';
 import { Menu, X, LogOut, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const TrainerDashboardNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { toast } = useToast();
   const location = useLocation();
+  const { logout, user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,14 +37,11 @@ const TrainerDashboardNavbar = () => {
   }, [location.pathname]);
 
   const handleLogout = () => {
+    logout();
     toast({
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
-    // In a real app, this would clear auth state
-    setTimeout(() => {
-      window.location.href = '/login';
-    }, 1000);
   };
 
   const navLinks = [
