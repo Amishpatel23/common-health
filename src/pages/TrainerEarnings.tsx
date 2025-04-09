@@ -91,6 +91,18 @@ const TrainerEarnings = () => {
     return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
   };
 
+  // Helper function to determine badge variant based on status
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'paid':
+        return 'default';
+      case 'processing':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 pt-16 lg:pl-64">
@@ -200,11 +212,7 @@ const TrainerEarnings = () => {
                           <TableCell>{formatDate(transaction.date)}</TableCell>
                           <TableCell>${transaction.amount}</TableCell>
                           <TableCell>
-                            <Badge variant={
-                              transaction.status === 'paid' ? 'success' : 
-                              transaction.status === 'processing' ? 'warning' : 
-                              'outline'
-                            }>
+                            <Badge variant={getBadgeVariant(transaction.status)}>
                               {transaction.status}
                             </Badge>
                           </TableCell>
@@ -244,11 +252,7 @@ const TrainerEarnings = () => {
                           <TableCell>1-on-1 Training</TableCell>
                           <TableCell>${transaction.amount}</TableCell>
                           <TableCell>
-                            <Badge variant={
-                              transaction.status === 'paid' ? 'success' : 
-                              transaction.status === 'processing' ? 'warning' : 
-                              'outline'
-                            }>
+                            <Badge variant={getBadgeVariant(transaction.status)}>
                               {transaction.status}
                             </Badge>
                           </TableCell>
