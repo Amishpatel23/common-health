@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -9,11 +9,12 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const { signup, isLoading, isAuthenticated, user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -23,6 +24,21 @@ const Signup = () => {
     agreeTerms: false
   });
   const [userType, setUserType] = useState('member');
+
+  // Enhanced redirection logic
+  useEffect(() => {
+    // Check if user is already authenticated
+    if (isAuthenticated && user) {
+      // Redirect based on user role
+      if (user.role === 'trainer') {
+        navigate('/trainer-dashboard');
+      } else if (user.role === 'member') {
+        navigate('/dashboard');
+      } else if (user.role === 'admin') {
+        navigate('/admin');
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,24 +80,15 @@ const Signup = () => {
     }
     
     try {
-      setIsLoading(true);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Success!",
-        description: "Your account has been created.",
+      // Use the AuthContext signup function
+      await signup({
+        firstName: formData.firstName,
+        email: formData.email,
+        password: formData.password,
+        role: userType as 'member' | 'trainer'
       });
       
-      // Redirect based on user type
-      setTimeout(() => {
-        if (userType === 'trainer') {
-          navigate('/trainer-dashboard');
-        } else {
-          navigate('/dashboard');
-        }
-      }, 1000);
+      // Toast and redirection handled in signup function and useEffect
       
     } catch (error) {
       toast({
@@ -89,8 +96,6 @@ const Signup = () => {
         description: "There was an error creating your account. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -122,6 +127,7 @@ const Signup = () => {
         </ToggleGroup>
       </div>
       
+      {/* Form fields */}
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Name Fields */}
         <div className="grid grid-cols-2 gap-4">
@@ -225,7 +231,6 @@ const Signup = () => {
         </Button>
       </form>
       
-      {/* Login link */}
       <div className="mt-8 text-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{' '}

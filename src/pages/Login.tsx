@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Label } from '@/components/ui/label';
@@ -21,9 +20,11 @@ const Login = () => {
     rememberMe: false
   });
 
-  // Redirect if already logged in
+  // Enhanced redirection logic
   useEffect(() => {
+    // Check if user is already authenticated
     if (isAuthenticated && user) {
+      // Redirect based on user role
       if (user.role === 'trainer') {
         navigate('/trainer-dashboard');
       } else if (user.role === 'member') {
@@ -61,22 +62,15 @@ const Login = () => {
     }
     
     try {
-      // Handle login
+      // Handle login - this should update isAuthenticated and user in AuthContext
       await login(formData.email, formData.password);
       
-      toast({
-        title: "Login Successful",
-        description: "Welcome back to Common Health!",
-      });
-      
-      // Redirect handled in useEffect
+      // Toast will be shown in login function
+      // Redirection is handled by useEffect
       
     } catch (error) {
-      toast({
-        title: "Login Failed",
-        description: "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
+      // Error handling is in login function
+      console.error("Login error:", error);
     }
   };
 

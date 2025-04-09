@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -128,7 +127,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (token && storedUser) {
           // In a real app, validate token with backend
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          console.log("User authenticated from storage:", parsedUser);
         }
       } catch (err) {
         console.error('Auth error:', err);
@@ -156,6 +157,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Update state
       setUser(response.user);
+      
+      console.log("User logged in successfully:", response.user);
       
       // Show success message
       toast({
@@ -197,6 +200,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Update state
       setUser(response.user);
+      
+      console.log("User signed up successfully:", response.user);
       
       // Show success message
       toast({
