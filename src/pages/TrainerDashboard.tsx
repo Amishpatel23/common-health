@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import DashboardNavbar from '@/components/TrainerDashboardNavbar';
+import DashboardNavbar from '@/components/DashboardNavbar';
 import DashboardSidebar from '@/components/TrainerDashboardSidebar';
 import OverviewCard from '@/components/dashboard/OverviewCard';
 import ActiveSessionBanner from '@/components/trainer/ActiveSessionBanner';
@@ -11,6 +11,7 @@ import UpcomingSessionsTable from '@/components/dashboard/UpcomingSessionsTable'
 import RecentChatsList from '@/components/dashboard/RecentChatsList';
 import { Calendar, Clock, DollarSign, Users, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Mock data
 const mockUpcomingSessions = [
@@ -101,7 +102,6 @@ const mockRecentChats = [
   },
 ];
 
-// Mock active session data
 const mockActiveSession = {
   id: '1',
   memberName: 'Emily Wilson',
@@ -110,22 +110,19 @@ const mockActiveSession = {
 };
 
 const TrainerDashboard = () => {
-  const [trainerName, setTrainerName] = useState('Alex');
+  const { user } = useAuth();
   const [availabilityStatus, setAvailabilityStatus] = useState('Available');
   const [hasActiveSession, setHasActiveSession] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // Simulate loading state
   const [isLoading, setIsLoading] = useState(true);
   const [contentLoaded, setContentLoaded] = useState(false);
   
   useEffect(() => {
-    // Simulate API fetch delay
     const timer = setTimeout(() => {
       setIsLoading(false);
       
-      // Add a small delay before showing content animation
       setTimeout(() => {
         setContentLoaded(true);
       }, 100);
@@ -134,10 +131,29 @@ const TrainerDashboard = () => {
     return () => clearTimeout(timer);
   }, []);
   
-  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
+  const getTrainerName = () => {
+    if (!user) return 'Trainer';
+    return user.name.split(' ')[0];
+  };
+
+  const getGreeting = () => {
+    if (!user) return "Welcome back, Trainer!";
+    
+    const firstName = user.name.split(' ')[0];
+    
+    const hour = new Date().getHours();
+    let timeGreeting = "Hello";
+    
+    if (hour < 12) timeGreeting = "Good morning";
+    else if (hour < 18) timeGreeting = "Good afternoon";
+    else timeGreeting = "Good evening";
+    
+    return `${timeGreeting}, Trainer ${firstName}!`;
+  };
   
   const handleStartSession = (sessionId: string) => {
     toast({
@@ -178,32 +194,28 @@ const TrainerDashboard = () => {
     toast({
       description: "Opening chat conversation...",
     });
-    // In a real app, navigate to chat page with this ID
+    navigate(`/chat/${chatId}`);
   };
   
   const handleUpdateAvailability = () => {
     toast({
       description: "Opening availability settings...",
     });
-    // In a real app, navigate to availability page
     navigate('/manage-availability');
   };
   
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <DashboardNavbar />
-        
         <div className="flex-1 pt-16 lg:pl-64">
           <DashboardSidebar />
           
           <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-            {/* Loading skeleton UI */}
             <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-bold">
-                    Welcome back, {trainerName}!
+                    Welcome back, {getTrainerName()}!
                   </h1>
                   <p className="text-muted-foreground mt-1">
                     Here's an overview of your training business.
@@ -227,10 +239,7 @@ const TrainerDashboard = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <DashboardNavbar />
-      
       <div className="flex-1 pt-16 lg:pl-64">
-        {/* Sidebar (desktop-only) */}
         <DashboardSidebar />
         
         <main 
@@ -238,18 +247,16 @@ const TrainerDashboard = () => {
             contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           } transition-all duration-500`}
         >
-          {/* Active Session Banner */}
           {hasActiveSession && (
             <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <ActiveSessionBanner session={mockActiveSession} />
             </div>
           )}
           
-          {/* Welcome message */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <h1 className="text-2xl sm:text-3xl font-bold">
-                Welcome back, {trainerName}!
+                {getGreeting()}
               </h1>
               <p className="text-muted-foreground mt-1">
                 Here's an overview of your training business.
@@ -265,7 +272,6 @@ const TrainerDashboard = () => {
             </Button>
           </div>
           
-          {/* Overview cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="animate-fade-in" style={{ animationDelay: '300ms' }}>
               <OverviewCard
@@ -299,11 +305,8 @@ const TrainerDashboard = () => {
             />
           </div>
           
-          {/* Main content grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left column - Session requests and upcoming sessions */}
             <div className="lg:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '700ms' }}>
-              {/* Session Requests */}
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Session Requests</h2>
@@ -319,7 +322,6 @@ const TrainerDashboard = () => {
                 />
               </div>
               
-              {/* Upcoming Sessions */}
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
@@ -361,9 +363,7 @@ const TrainerDashboard = () => {
               </div>
             </div>
             
-            {/* Right column - Recent chats and availability widget */}
             <div className="space-y-6 animate-fade-in" style={{ animationDelay: '800ms' }}>
-              {/* Recent Chats */}
               <div>
                 <h2 className="text-xl font-semibold mb-4">Recent Chats</h2>
                 <RecentChatsList
@@ -372,7 +372,6 @@ const TrainerDashboard = () => {
                 />
               </div>
               
-              {/* Availability Widget */}
               <div className="border border-border rounded-xl p-5 bg-white dark:bg-black">
                 <h2 className="text-xl font-semibold mb-3">Quick Availability</h2>
                 <p className="text-sm text-muted-foreground mb-4">

@@ -18,14 +18,7 @@ import {
   SendHorizontal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +26,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from '@/contexts/AuthContext';
 
 const getMockSessionData = (sessionId: string) => {
@@ -87,7 +79,7 @@ interface ChatMessageProps {
 
 const ChatMessage = ({ message, isTrainer }: ChatMessageProps) => {
   const isSelf = (isTrainer && message.sender === 'trainer') || 
-                 (!isTrainer && message.sender === 'member');
+                (!isTrainer && message.sender === 'member');
   
   return (
     <div className={`flex ${isSelf ? 'justify-end' : 'justify-start'} mb-4`}>

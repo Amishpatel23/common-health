@@ -166,7 +166,7 @@ const Dashboard = () => {
     if (!user) return "Welcome";
     
     const firstName = user.name.split(' ')[0];
-    const role = user.role === 'trainer' ? 'Trainer' : 'Member';
+    const roleTitle = user.role === 'trainer' ? 'Trainer' : 'Member';
     
     const hour = new Date().getHours();
     let timeGreeting = "Hello";
@@ -175,7 +175,7 @@ const Dashboard = () => {
     else if (hour < 18) timeGreeting = "Good afternoon";
     else timeGreeting = "Good evening";
     
-    return `${timeGreeting}, ${role} ${firstName}!`;
+    return `${timeGreeting}, ${roleTitle} ${firstName}!`;
   };
   
   // Loading skeleton
@@ -238,7 +238,7 @@ const Dashboard = () => {
               </p>
             </div>
             <Button 
-              className="shrink-0 animate-fade-in hover-lift" 
+              className="shrink-0 animate-fade-in" 
               style={{ animationDelay: '200ms' }}
               onClick={() => navigate('/find-trainers')}
             >

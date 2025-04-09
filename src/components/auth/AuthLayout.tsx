@@ -25,7 +25,7 @@ const AuthLayout = ({ children, heading, subheading, imageSrc = "/lovable-upload
             Transform <br />Your Fitness
           </h1>
           <p className="text-white/90 text-xl mt-4 max-w-md">
-            Connect with expert trainers and achieve your health goals
+            Connect with expert trainers and achieve your health goals with Common Health
           </p>
         </div>
       </div>

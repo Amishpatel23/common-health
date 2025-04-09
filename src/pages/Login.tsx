@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import AuthLayout from '@/components/auth/AuthLayout';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +20,19 @@ const Login = () => {
     password: '',
     rememberMe: false
   });
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'trainer') {
+        navigate('/trainer-dashboard');
+      } else if (user.role === 'member') {
+        navigate('/dashboard');
+      } else if (user.role === 'admin') {
+        navigate('/admin');
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,10 +69,7 @@ const Login = () => {
         description: "Welcome back to Common Health!",
       });
       
-      // Redirect based on user role
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
+      // Redirect handled in useEffect
       
     } catch (error) {
       toast({
@@ -149,6 +159,13 @@ const Login = () => {
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </Button>
+
+        {/* Demo credentials for testing */}
+        <div className="text-sm text-center text-muted-foreground">
+          <p className="mb-1 font-medium">Demo Credentials:</p>
+          <p>Member: member@example.com / password</p>
+          <p>Trainer: trainer@example.com / password</p>
+        </div>
       </form>
       
       <div className="mt-8 text-center">
