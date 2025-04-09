@@ -40,7 +40,7 @@ const Contact = () => {
         <section className="bg-secondary/30 py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="aspect-[16/9] rounded-2xl overflow-hidden shadow-md">
-              {/* Placeholder for map (in a real application, you would integrate Google Maps or similar) */}
+              {"https://maps.app.goo.gl/biEKp1tpZbx1sEx57"}
               <div className="w-full h-full bg-secondary/50 flex items-center justify-center">
                 <p className="text-muted-foreground text-lg">Interactive Map Would Be Displayed Here</p>
               </div>
