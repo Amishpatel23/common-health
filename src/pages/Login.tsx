@@ -52,11 +52,11 @@ const Login = () => {
       await login(formData.email, formData.password);
       
       toast({
-        title: "Success!",
-        description: "You're now logged in.",
+        title: "Login Successful",
+        description: "Welcome back to Common Health!",
       });
       
-      // Redirect based on user type (simplified example)
+      // Redirect based on user role
       setTimeout(() => {
         navigate('/dashboard');
       }, 1000);
@@ -73,10 +73,9 @@ const Login = () => {
   return (
     <AuthLayout 
       heading="Welcome back" 
-      subheading="continue your fitness journey"
+      subheading="Continue your fitness journey"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Email Field */}
         <div className="space-y-2">
           <Label htmlFor="email">
             Email Address <span className="text-red-500">*</span>
@@ -94,7 +93,6 @@ const Login = () => {
           />
         </div>
         
-        {/* Password Field */}
         <div className="space-y-2">
           <div className="flex justify-between">
             <Label htmlFor="password">
@@ -102,7 +100,7 @@ const Login = () => {
             </Label>
             <Link 
               to="/forgot-password" 
-              className="text-sm font-medium text-primary hover:underline"
+              className="text-sm font-medium text-red-600 hover:underline"
             >
               Forgot password?
             </Link>
@@ -129,7 +127,6 @@ const Login = () => {
           </div>
         </div>
         
-        {/* Remember Me */}
         <div className="flex items-center space-x-2">
           <Checkbox 
             id="rememberMe" 
@@ -145,7 +142,6 @@ const Login = () => {
           </label>
         </div>
         
-        {/* Submit Button */}
         <Button 
           type="submit" 
           className="w-full h-11 bg-red-600 hover:bg-red-700 transition-colors"
@@ -155,7 +151,6 @@ const Login = () => {
         </Button>
       </form>
       
-      {/* Register link */}
       <div className="mt-8 text-center">
         <p className="text-sm text-muted-foreground">
           Don't have an account yet?{' '}

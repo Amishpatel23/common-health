@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardSidebar from '@/components/DashboardSidebar';
@@ -162,8 +161,22 @@ const Dashboard = () => {
     navigate('/chat');
   };
   
-  // Display the user's first name if available
-  const firstName = user?.name ? user.name.split(' ')[0] : 'there';
+  // Create a personalized greeting based on user role and name
+  const getGreeting = () => {
+    if (!user) return "Welcome";
+    
+    const firstName = user.name.split(' ')[0];
+    const role = user.role === 'trainer' ? 'Trainer' : 'Member';
+    
+    const hour = new Date().getHours();
+    let timeGreeting = "Hello";
+    
+    if (hour < 12) timeGreeting = "Good morning";
+    else if (hour < 18) timeGreeting = "Good afternoon";
+    else timeGreeting = "Good evening";
+    
+    return `${timeGreeting}, ${role} ${firstName}!`;
+  };
   
   // Loading skeleton
   if (isLoading) {
@@ -214,11 +227,11 @@ const Dashboard = () => {
             contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           } transition-all duration-500`}
         >
-          {/* Welcome message */}
+          {/* Welcome message with personalized greeting */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <h1 className="text-2xl sm:text-3xl font-bold">
-                Welcome back, {firstName}!
+                {getGreeting()}
               </h1>
               <p className="text-muted-foreground mt-1">
                 Here's what's happening with your fitness journey today.

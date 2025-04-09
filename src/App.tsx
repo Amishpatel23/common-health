@@ -29,7 +29,14 @@ import FavoriteTrainers from "./pages/FavoriteTrainers";
 import PaymentHistory from "./pages/PaymentHistory";
 
 // Create a new query client instance
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 // Auth-aware Layout component that handles the navbar logic
 const AppLayout = () => {
@@ -70,29 +77,30 @@ const AppLayout = () => {
 const AppRoutes = () => {
   return (
     <>
+      <AppLayout />
       <Routes>
-        <Route path="/" element={<><AppLayout /><Index /></>} />
-        <Route path="/how-it-works" element={<><AppLayout /><HowItWorks /></>} />
-        <Route path="/contact" element={<><AppLayout /><Contact /></>} />
-        <Route path="/login" element={<><AppLayout /><Login /></>} />
-        <Route path="/signup" element={<><AppLayout /><Signup /></>} />
-        <Route path="/forgot-password" element={<><AppLayout /><ForgotPassword /></>} />
-        <Route path="/reset-password/:token" element={<><AppLayout /><ResetPassword /></>} />
-        <Route path="/dashboard" element={<><AppLayout /><Dashboard /></>} />
-        <Route path="/trainer-dashboard" element={<><AppLayout /><TrainerDashboard /></>} />
-        <Route path="/admin" element={<><AppLayout /><AdminPanel /></>} />
-        <Route path="/chat" element={<><AppLayout /><Chat /></>} />
-        <Route path="/find-trainers" element={<><AppLayout /><FindTrainers /></>} />
-        <Route path="/trainers" element={<><AppLayout /><FindTrainers /></>} />
-        <Route path="/trainer-profile/:trainerId" element={<><AppLayout /><TrainerProfile /></>} />
-        <Route path="/book-session/:trainerId" element={<><AppLayout /><BookSession /></>} />
-        <Route path="/video-session/:sessionId" element={<><AppLayout /><VideoSession /></>} />
-        <Route path="/my-sessions" element={<><AppLayout /><Dashboard /></>} />
-        <Route path="/profile" element={<><AppLayout /><MemberProfile /></>} />
-        <Route path="/favorites" element={<><AppLayout /><FavoriteTrainers /></>} />
-        <Route path="/payments" element={<><AppLayout /><PaymentHistory /></>} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<><AppLayout /><NotFound /></>} />
+        <Route path="/" element={<Index />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
+        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/find-trainers" element={<FindTrainers />} />
+        <Route path="/trainers" element={<FindTrainers />} />
+        <Route path="/trainer-profile/:trainerId" element={<TrainerProfile />} />
+        <Route path="/book-session/:trainerId" element={<BookSession />} />
+        <Route path="/video-session/:sessionId" element={<VideoSession />} />
+        <Route path="/video-session" element={<VideoSession />} /> {/* Added for incoming calls simulation */}
+        <Route path="/my-sessions" element={<Dashboard />} />
+        <Route path="/profile" element={<MemberProfile />} />
+        <Route path="/favorites" element={<FavoriteTrainers />} />
+        <Route path="/payments" element={<PaymentHistory />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
       <Sonner />

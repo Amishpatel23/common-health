@@ -17,15 +17,15 @@ const AuthLayout = ({ children, heading, subheading, imageSrc = "/lovable-upload
         <img 
           src={imageSrc} 
           alt="Fitness motivation" 
-          className="w-full h-full object-cover opacity-80"
+          className="w-full h-full object-cover opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
         <div className="absolute inset-0 flex flex-col justify-center p-12">
           <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">
-            Transform <br />Your Journey
+            Transform <br />Your Fitness
           </h1>
-          <p className="text-white/80 text-xl mt-4 max-w-md">
-            Connect with expert trainers and achieve your fitness goals
+          <p className="text-white/90 text-xl mt-4 max-w-md">
+            Connect with expert trainers and achieve your health goals
           </p>
         </div>
       </div>
