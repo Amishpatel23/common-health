@@ -10,8 +10,12 @@ import {
   DollarSign, 
   User,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  LogOut
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface SidebarLinkProps {
   icon: React.ElementType;
@@ -45,6 +49,8 @@ interface DashboardSidebarProps {
 
 const TrainerDashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) => {
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
   
   const sidebarLinks = [
     { icon: Home, label: "Dashboard", href: "/trainer-dashboard" },
@@ -55,13 +61,38 @@ const TrainerDashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebar
     { icon: User, label: "Profile", href: "/profile" },
   ];
 
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+  };
+
+  // Get user initials for avatar fallback
+  const getInitials = () => {
+    if (!user?.name) return 'T';
+    return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
   return (
     <aside className={cn(
       "h-full bg-white dark:bg-black border-r border-border flex-shrink-0",
       isMobile ? "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out" : "w-64 hidden lg:block"
     )}>
       <div className="p-4 space-y-6 h-full flex flex-col">
-        <div className="pt-16 pb-1">
+        <div className="pt-6 pb-1">
+          {/* User profile section */}
+          <div className="flex items-center gap-3 mb-6 px-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
+              <AvatarFallback>{getInitials()}</AvatarFallback>
+            </Avatar>
+            <div className="overflow-hidden">
+              <p className="font-medium truncate">{user?.name || 'Trainer'}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || 'trainer@example.com'}</p>
+            </div>
+          </div>
           <h2 className="text-lg font-semibold px-3">Trainer Menu</h2>
         </div>
         
@@ -75,6 +106,14 @@ const TrainerDashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebar
               isActive={location.pathname === link.href}
             />
           ))}
+          
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 px-3 py-2 mt-6 rounded-lg transition-colors duration-200 text-foreground/70 hover:bg-secondary hover:text-red-500"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </button>
         </nav>
         
         <div className="p-4 bg-secondary/40 rounded-lg space-y-2">

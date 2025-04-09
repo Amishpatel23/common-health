@@ -1,8 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import DashboardNavbar from '@/components/DashboardNavbar';
-import DashboardSidebar from '@/components/TrainerDashboardSidebar';
+import TrainerDashboardSidebar from '@/components/TrainerDashboardSidebar';
 import OverviewCard from '@/components/dashboard/OverviewCard';
 import ActiveSessionBanner from '@/components/trainer/ActiveSessionBanner';
 import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
@@ -207,10 +207,10 @@ const TrainerDashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <div className="flex-1 pt-16 lg:pl-64">
-          <DashboardSidebar />
+        <div className="flex-1">
+          <TrainerDashboardSidebar />
           
-          <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+          <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6 lg:pl-64 pt-6">
             <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -239,11 +239,11 @@ const TrainerDashboard = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-1 pt-16 lg:pl-64">
-        <DashboardSidebar />
+      <div className="flex-1">
+        <TrainerDashboardSidebar />
         
         <main 
-          className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 ${
+          className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 lg:pl-64 pt-6 ${
             contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           } transition-all duration-500`}
         >

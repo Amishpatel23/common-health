@@ -49,6 +49,7 @@ interface DashboardSidebarProps {
 const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const toast = useToast();
   
   const sidebarLinks = [
     { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -66,6 +67,14 @@ const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) 
     return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+  };
+
   return (
     <aside className={cn(
       "h-full bg-white dark:bg-black border-r border-border flex-shrink-0",
@@ -73,7 +82,7 @@ const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) 
     )}>
       <div className="p-4 space-y-6 h-full flex flex-col">
         {/* User profile section */}
-        <div className="pt-16 pb-1">
+        <div className="pt-6 pb-1">
           <div className="flex items-center gap-3 mb-4 px-3">
             <Avatar className="h-10 w-10">
               <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
@@ -106,7 +115,7 @@ const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) 
           ))}
 
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 text-foreground/70 hover:bg-secondary hover:text-red-500 w-full text-left mt-4"
           >
             <LogOut className="h-5 w-5" />

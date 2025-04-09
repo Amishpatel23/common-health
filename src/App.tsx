@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -93,19 +92,9 @@ const AppLayout = () => {
     location.pathname.includes('/favorites') ||
     location.pathname.includes('/payments');
   
-  // Don't show any navbar on auth routes or video session routes
-  if (isAuthRoute || isVideoSessionRoute) {
+  // Don't show any navbar on auth routes, video session routes, or dashboard routes when authenticated
+  if (isAuthRoute || isVideoSessionRoute || (isDashboardRoute && isAuthenticated)) {
     return null;
-  }
-  
-  // Show trainer dashboard navbar for trainer routes
-  if (isTrainerRoute && isAuthenticated && user?.role === 'trainer') {
-    return <TrainerDashboardNavbar />;
-  }
-  
-  // Show dashboard navbar on dashboard routes when authenticated
-  if (isDashboardRoute && isAuthenticated) {
-    return <DashboardNavbar />;
   }
   
   // Show regular navbar on other routes

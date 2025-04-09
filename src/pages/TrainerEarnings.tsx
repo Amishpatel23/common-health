@@ -105,10 +105,10 @@ const TrainerEarnings = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-1 pt-16 lg:pl-64">
+      <div className="flex-1">
         <TrainerDashboardSidebar />
         
-        <main className="p-4 md:p-6 max-w-7xl mx-auto">
+        <main className="p-4 md:p-6 max-w-7xl mx-auto lg:pl-64 pt-6">
           <div className="mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold">Earnings</h1>
             <p className="text-muted-foreground mt-1">

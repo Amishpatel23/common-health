@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Menu, X, LogOut, Bell } from 'lucide-react';
+import { Menu, X, LogOut, Bell, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
+// This component is no longer displayed on dashboard pages - it has been replaced with sidebar navigation
+// It's kept in the codebase for reference or potential reuse on other pages
 const TrainerDashboardNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
