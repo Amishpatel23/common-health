@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,12 +45,7 @@ const LoginForm = () => {
       
       // Check if admin login
       if (formData.email === 'amish0609@gmail.com' && formData.password === 'Amish0609@2003') {
-        await login({
-          id: 'admin-1',
-          name: 'Admin User',
-          email: formData.email,
-          role: 'admin'
-        });
+        await login(formData.email, formData.password);
         
         toast({
           title: "Admin Login Successful",
@@ -66,12 +60,7 @@ const LoginForm = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Simulate login (this would be replaced by actual authentication)
-      await login({
-        id: 'user-1',
-        name: 'John Doe',
-        email: formData.email,
-        role: 'member'
-      });
+      await login(formData.email, formData.password);
       
       toast({
         title: "Success!",
