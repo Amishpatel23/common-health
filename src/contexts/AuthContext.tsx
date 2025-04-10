@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -207,27 +206,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await mockApiCall('/api/auth/signup', userData);
       
-      // Save token and user to localStorage
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      // Update state
-      setUser(response.user);
+      // We're not saving the token or user to localStorage anymore
+      // We'll just return the response for the success message
       
       console.log("User signed up successfully:", response.user);
       
-      // Show success message
-      toast({
-        title: "Signup successful",
-        description: `Welcome, ${response.user.name}!`,
-      });
+      return response.user;
       
-      // Redirect based on role
-      if (response.user.role === 'trainer') {
-        navigate('/trainer-dashboard');
-      } else {
-        navigate('/dashboard');
-      }
     } catch (err: any) {
       setError(err.message || 'Failed to signup');
       toast({
@@ -235,6 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: err.message || 'There was an error creating your account',
         variant: "destructive",
       });
+      throw err;
     } finally {
       setIsLoading(false);
     }
