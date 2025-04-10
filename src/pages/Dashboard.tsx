@@ -1,19 +1,17 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardSidebar from '@/components/DashboardSidebar';
-import DashboardNavbar from '@/components/DashboardNavbar';
+import DashboardLayout from '@/components/DashboardLayout';
 import OverviewCard from '@/components/dashboard/OverviewCard';
 import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
 import TrainerRecommendation from '@/components/dashboard/TrainerRecommendation';
 import RecentChatsList from '@/components/dashboard/RecentChatsList';
 import UpcomingSessionsTable from '@/components/dashboard/UpcomingSessionsTable';
-import { Calendar, Clock, Users, CreditCard, Search } from 'lucide-react';
+import { Calendar, Clock, Users, CreditCard, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import SessionNotification from '@/components/SessionNotification';
 
-// Mock data - in a real app, this would come from API
 const mockUpcomingSessions = [
   {
     id: '1',
@@ -113,20 +111,16 @@ const Dashboard = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // Loading states
   const [isLoading, setIsLoading] = useState(true);
   const [contentLoaded, setContentLoaded] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   useEffect(() => {
-    // Scroll to top on page load
     window.scrollTo(0, 0);
     
-    // Simulate API fetch delay
     const timer = setTimeout(() => {
       setIsLoading(false);
       
-      // Add a small delay before showing content animation
       setTimeout(() => {
         setContentLoaded(true);
       }, 100);
@@ -163,17 +157,12 @@ const Dashboard = () => {
   const handleChatSelect = (chatId: string) => {
     navigate('/chat');
   };
-  
-  const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen);
-  };
 
-  // Create a personalized greeting based on user role and name
   const getGreeting = () => {
     if (!user) return "Welcome";
     
-    const firstName = user.name.split(' ')[0];
-    const roleTitle = user.role === 'trainer' ? 'Trainer' : 'Member';
+    const firstName = user.name?.split(' ')[0] || '';
+    const roleTitle = user?.role === 'trainer' ? 'Trainer' : 'Member';
     
     const hour = new Date().getHours();
     let timeGreeting = "Hello";
@@ -185,82 +174,61 @@ const Dashboard = () => {
     return `${timeGreeting}, ${roleTitle} ${firstName}!`;
   };
   
-  // Loading skeleton
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <div className="flex-1 pt-16 lg:pl-64">
-          <DashboardSidebar />
-          <DashboardNavbar onMenuClick={toggleMobileSidebar} />
-          <DashboardSidebar isMobile={true} onClose={() => setIsMobileSidebarOpen(false)} />
-          
-          <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-            {/* Loading skeleton UI */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="w-3/4">
-                <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded-md shimmer mb-3 w-2/3"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md shimmer w-full"></div>
-              </div>
-              <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded-md shimmer w-40"></div>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
-                <div className="h-48 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
-              </div>
-              <div className="space-y-6">
-                <div className="h-48 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
-                <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
-              </div>
-            </div>
-          </main>
+      <DashboardLayout 
+        title="Loading..." 
+        description="Please wait while we load your dashboard"
+        showBackButton={false}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-32 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+          ))}
         </div>
-      </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+            <div className="h-48 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+          </div>
+          <div className="space-y-6">
+            <div className="h-48 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+            <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+          </div>
+        </div>
+      </DashboardLayout>
     );
   }
   
+  const renderSessionNotification = () => {
+    if (!user || user.role !== 'member') return null;
+    return <SessionNotification upcomingSessions={mockUpcomingSessions} />;
+  };
+  
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1 pt-16 lg:pl-64">
-        <DashboardSidebar />
-        <DashboardNavbar onMenuClick={toggleMobileSidebar} />
-        {isMobileSidebarOpen && (
-          <DashboardSidebar isMobile={true} onClose={() => setIsMobileSidebarOpen(false)} />
-        )}
-        
-        <main 
-          className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 ${
+    <>
+      {renderSessionNotification()}
+      
+      <DashboardLayout 
+        title={getGreeting()}
+        description="Here's what's happening with your fitness journey today."
+        showBackButton={false}
+        actions={
+          <Button 
+            onClick={() => navigate('/find-trainers')}
+            className="shrink-0 animate-fade-in"
+          >
+            <Search className="mr-2 h-4 w-4" />
+            Find Trainers
+          </Button>
+        }
+      >
+        <div 
+          className={`space-y-6 ${
             contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           } transition-all duration-500`}
         >
-          {/* Welcome message with personalized greeting */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-              <h1 className="text-2xl sm:text-3xl font-bold">
-                {getGreeting()}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Here's what's happening with your fitness journey today.
-              </p>
-            </div>
-            <Button 
-              className="shrink-0 animate-fade-in" 
-              style={{ animationDelay: '200ms' }}
-              onClick={() => navigate('/find-trainers')}
-            >
-              <Search className="mr-2 h-4 w-4" />
-              Find Trainers
-            </Button>
-          </div>
-          
-          {/* Overview cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="animate-fade-in" style={{ animationDelay: '300ms' }}>
               <OverviewCard
@@ -287,23 +255,23 @@ const Dashboard = () => {
                 value="4"
                 description="2 active currently"
                 icon={<Users className="h-5 w-5" />}
-                className="hover-lift"
+                onClick={() => navigate('/my-trainers')}
+                className="hover-lift cursor-pointer"
               />
             </div>
             <div className="animate-fade-in" style={{ animationDelay: '600ms' }}>
               <OverviewCard
                 title="Subscription"
                 value={user?.membershipDetails?.plan || "Basic"}
-                description={`Renews on ${user?.membershipDetails?.endDate || 'N/A'}`}
+                description={`Renews on ${user?.membershipDetails?.endDate || '2025-05-10'}`}
                 icon={<CreditCard className="h-5 w-5" />}
-                className="hover-lift"
+                onClick={() => navigate('/payments')}
+                className="hover-lift cursor-pointer"
               />
             </div>
           </div>
           
-          {/* Main content grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left column - Upcoming session */}
             <div className="lg:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '700ms' }}>
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -347,7 +315,6 @@ const Dashboard = () => {
               </div>
             </div>
             
-            {/* Right column - Trainer recommendations and chats */}
             <div className="space-y-6 animate-fade-in" style={{ animationDelay: '800ms' }}>
               <div className="bg-white dark:bg-black rounded-xl p-4 border border-border">
                 <div className="flex items-center justify-between mb-4">
@@ -382,9 +349,9 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+      </DashboardLayout>
+    </>
   );
 };
 

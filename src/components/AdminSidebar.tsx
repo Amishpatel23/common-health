@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
   Home, 
@@ -14,12 +14,14 @@ import {
   ShieldAlert,
   MessageSquare,
   Bell,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import BackButton from './BackButton';
 
 interface SidebarLinkProps {
   icon: React.ElementType;
@@ -53,6 +55,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ isMobile = false, onClose }: AdminSidebarProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { toast } = useToast();
   
@@ -78,6 +81,7 @@ const AdminSidebar = ({ isMobile = false, onClose }: AdminSidebarProps) => {
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
+    navigate('/login');
   };
 
   return (
@@ -86,6 +90,21 @@ const AdminSidebar = ({ isMobile = false, onClose }: AdminSidebarProps) => {
       isMobile ? "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out" : "w-64 hidden lg:block"
     )}>
       <div className="p-4 space-y-6 h-full flex flex-col">
+        {isMobile && (
+          <div className="flex justify-between items-center">
+            <BackButton fallbackPath="/admin" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose} 
+              className="lg:hidden"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
+        )}
+        
         <div className="pt-6 pb-1">
           <div className="flex items-center gap-3 mb-4 px-3">
             <Avatar className="h-10 w-10 bg-primary/10">

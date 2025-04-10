@@ -14,8 +14,9 @@ import { useAuth } from '@/contexts/AuthContext';
 const Signup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signup, isLoading, isAuthenticated, user } = useAuth();
+  const { signup, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -24,21 +25,6 @@ const Signup = () => {
     agreeTerms: false
   });
   const [userType, setUserType] = useState('member');
-
-  // Enhanced redirection logic
-  useEffect(() => {
-    // Check if user is already authenticated
-    if (isAuthenticated && user) {
-      // Redirect based on user role
-      if (user.role === 'trainer') {
-        navigate('/trainer-dashboard');
-      } else if (user.role === 'member') {
-        navigate('/dashboard');
-      } else if (user.role === 'admin') {
-        navigate('/admin');
-      }
-    }
-  }, [isAuthenticated, user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,7 +74,18 @@ const Signup = () => {
         role: userType as 'member' | 'trainer'
       });
       
-      // Toast and redirection handled in signup function and useEffect
+      // Show success state instead of redirecting immediately
+      setSignupSuccess(true);
+      
+      toast({
+        title: "Account Created Successfully",
+        description: "Your account has been created. Please login to continue.",
+      });
+      
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
       
     } catch (error) {
       toast({
@@ -98,6 +95,34 @@ const Signup = () => {
       });
     }
   };
+
+  // If signup was successful, show confirmation screen
+  if (signupSuccess) {
+    return (
+      <AuthLayout 
+        heading="Account Created!" 
+        subheading="You can now log in to your account"
+      >
+        <div className="text-center p-6 space-y-4">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium">Registration Successful!</h3>
+          <p className="text-muted-foreground">
+            Your account has been created successfully. Redirecting you to login page...
+          </p>
+          <Button 
+            onClick={() => navigate('/login')} 
+            className="w-full h-11 mt-4"
+          >
+            Go to Login
+          </Button>
+        </div>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout 

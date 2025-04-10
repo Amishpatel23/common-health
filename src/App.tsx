@@ -17,6 +17,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import MyTrainers from "./pages/MyTrainers";
 import TrainerDashboard from "./pages/TrainerDashboard";
 import AdminPanel from "./pages/AdminPanel";
 import Chat from "./pages/Chat";
@@ -94,7 +95,8 @@ const AppLayout = () => {
     location.pathname.includes('/my-sessions') ||
     location.pathname.includes('/profile') ||
     location.pathname.includes('/favorites') ||
-    location.pathname.includes('/payments');
+    location.pathname.includes('/payments') ||
+    location.pathname.includes('/my-trainers');
   
   // Don't show any navbar on auth routes, video session routes, or dashboard routes when authenticated
   if (isAuthRoute || isVideoSessionRoute || (isDashboardRoute && isAuthenticated)) {
@@ -134,6 +136,11 @@ const AppRoutes = () => {
         <Route path="/favorites" element={
           <ProtectedRoute allowedRoles={['member']}>
             <FavoriteTrainers />
+          </ProtectedRoute>
+        } />
+        <Route path="/my-trainers" element={
+          <ProtectedRoute allowedRoles={['member']}>
+            <MyTrainers />
           </ProtectedRoute>
         } />
         <Route path="/find-trainers" element={
