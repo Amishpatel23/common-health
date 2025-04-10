@@ -40,8 +40,20 @@ const mockApiCall = async (endpoint: string, data: any): Promise<any> => {
   await new Promise(resolve => setTimeout(resolve, 1000));
   
   if (endpoint === '/api/auth/login') {
-    // Mock login check
-    if (data.email === 'member@example.com' && data.password === 'password') {
+    // Admin login check
+    if (data.email === 'amish0609@gmail.com' && data.password === 'Amish0609@2003') {
+      return {
+        user: {
+          id: 'admin-123',
+          name: 'Admin User',
+          email: 'amish0609@gmail.com',
+          role: 'admin',
+        },
+        token: 'mock-jwt-token-admin',
+      };
+    }
+    // Mock login check for regular users
+    else if (data.email === 'member@example.com' && data.password === 'password') {
       return {
         user: {
           id: '123',

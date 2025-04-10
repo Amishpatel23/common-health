@@ -69,7 +69,7 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
 // Auth-aware Layout component that handles the navbar logic
 const AppLayout = () => {
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   // Determine if this is an authentication route
   const isAuthRoute = location.pathname === '/login' || 
@@ -181,6 +181,41 @@ const AppRoutes = () => {
         
         {/* Admin routes */}
         <Route path="/admin" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/users" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/sessions" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/payments" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/chats" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/notifications" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/reports" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/settings" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminPanel />
           </ProtectedRoute>

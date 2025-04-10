@@ -3,15 +3,23 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
-  LayoutDashboard, 
+  Home, 
   Users, 
-  Video, 
+  CalendarClock,
   CreditCard, 
-  BarChart, 
-  Settings,
+  User,
   ChevronRight,
-  HelpCircle
+  LogOut,
+  Settings,
+  ShieldAlert,
+  MessageSquare,
+  Bell,
+  AlertCircle
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface SidebarLinkProps {
   icon: React.ElementType;
@@ -45,15 +53,32 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ isMobile = false, onClose }: AdminSidebarProps) => {
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
   
   const sidebarLinks = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
+    { icon: Home, label: "Dashboard", href: "/admin" },
     { icon: Users, label: "User Management", href: "/admin/users" },
-    { icon: Video, label: "Session Monitoring", href: "/admin/sessions" },
-    { icon: CreditCard, label: "Payment Management", href: "/admin/payments" },
-    { icon: BarChart, label: "Reports & Analytics", href: "/admin/reports" },
-    { icon: Settings, label: "Platform Settings", href: "/admin/settings" },
+    { icon: CalendarClock, label: "Sessions", href: "/admin/sessions" },
+    { icon: CreditCard, label: "Payments", href: "/admin/payments" },
+    { icon: MessageSquare, label: "Chat Moderation", href: "/admin/chats" },
+    { icon: Bell, label: "Notifications", href: "/admin/notifications" },
+    { icon: AlertCircle, label: "Reports", href: "/admin/reports" },
+    { icon: Settings, label: "Settings", href: "/admin/settings" },
   ];
+
+  const getInitials = () => {
+    if (!user?.name) return 'A';
+    return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+  };
 
   return (
     <aside className={cn(
@@ -61,8 +86,25 @@ const AdminSidebar = ({ isMobile = false, onClose }: AdminSidebarProps) => {
       isMobile ? "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out" : "w-64 hidden lg:block"
     )}>
       <div className="p-4 space-y-6 h-full flex flex-col">
-        <div className="pt-16 pb-1">
-          <h2 className="text-lg font-semibold px-3">Admin Panel</h2>
+        <div className="pt-6 pb-1">
+          <div className="flex items-center gap-3 mb-4 px-3">
+            <Avatar className="h-10 w-10 bg-primary/10">
+              <AvatarImage src={user?.avatar} alt={user?.name || 'Admin'} />
+              <AvatarFallback className="bg-primary/10 text-primary">{getInitials()}</AvatarFallback>
+            </Avatar>
+            <div className="overflow-hidden">
+              <p className="font-medium truncate">{user?.name || 'Admin'}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || 'admin@example.com'}</p>
+            </div>
+          </div>
+          <div className="px-3 mb-2">
+            <div className="w-full h-2 bg-red-400/20 rounded-full overflow-hidden">
+              <div className="h-full bg-red-500/70 rounded-full" style={{ width: '100%' }} />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 text-center">
+              Admin Access
+            </p>
+          </div>
         </div>
         
         <nav className="space-y-1 flex-1">
@@ -75,18 +117,24 @@ const AdminSidebar = ({ isMobile = false, onClose }: AdminSidebarProps) => {
               isActive={location.pathname === link.href}
             />
           ))}
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 text-foreground/70 hover:bg-secondary hover:text-red-500 w-full text-left mt-4"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </button>
         </nav>
         
-        <div className="p-4 bg-secondary/40 rounded-lg space-y-2">
-          <h3 className="font-medium text-sm">Help & Support</h3>
-          <p className="text-xs text-muted-foreground">Need help with admin settings or having trouble with the platform?</p>
-          <Link 
-            to="/admin/support" 
-            className="inline-flex items-center text-xs text-primary hover:underline"
-          >
-            <HelpCircle className="mr-1 h-3 w-3" />
-            Admin Support
-          </Link>
+        <div className="p-4 bg-red-500/10 rounded-lg space-y-2">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-red-500" />
+            <h3 className="font-medium text-sm">Admin Panel</h3>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            You have full control over the platform. Use your privileges responsibly.
+          </p>
         </div>
       </div>
     </aside>

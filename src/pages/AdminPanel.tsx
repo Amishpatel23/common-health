@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '@/components/DashboardNavbar';
-import DashboardSidebar from '@/components/DashboardSidebar';
+import AdminSidebar from '@/components/AdminSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,6 +39,7 @@ import {
   ArrowDownRight
 } from 'lucide-react';
 import LineChart from '@/components/admin/LineChart';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Types
 interface User {
@@ -208,6 +210,20 @@ const AdminPanel = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  
+  useEffect(() => {
+    // Check if user has admin role
+    if (user && user.role !== 'admin') {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access this page",
+        variant: "destructive",
+      });
+      navigate('/');
+    }
+  }, [user, navigate, toast]);
   
   // Filter users based on search query
   const filteredUsers = users.filter(user => 
@@ -256,13 +272,20 @@ const AdminPanel = () => {
     });
   };
   
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
-      <DashboardNavbar />
+      <DashboardNavbar onMenuClick={toggleMobileSidebar} />
       
       <div className="flex-1 pt-16 lg:pl-64">
         {/* Sidebar (desktop-only) */}
-        <DashboardSidebar />
+        <AdminSidebar />
+        {isMobileSidebarOpen && (
+          <AdminSidebar isMobile={true} onClose={() => setIsMobileSidebarOpen(false)} />
+        )}
         
         <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
           {/* Header */}
