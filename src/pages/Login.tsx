@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthLayout from '@/components/auth/AuthLayout';
-import { LoginForm } from '@/components/LoginForm';
+import LoginForm from '@/components/LoginForm';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
 
@@ -11,15 +11,19 @@ const Login: React.FC = () => {
   
   return (
     <AuthLayout
-      title="Log in to your account"
-      subtitle="Welcome back! Please enter your credentials to continue."
+      heading="Log in to your account"
+      subheading="Welcome back! Please enter your credentials to continue."
     >
       {showAdminInfo && (
         <Alert className="mb-6">
           <Info className="h-4 w-4" />
           <AlertTitle>Admin Access</AlertTitle>
           <AlertDescription>
-            For admin access, use the credentials provided by your system administrator.
+            For admin access, use these credentials:
+            <br />
+            Email: amish0609@gmail.com
+            <br />
+            Password: Amish0609@2003
           </AlertDescription>
         </Alert>
       )}
