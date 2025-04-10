@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginForm = () => {
   const { toast } = useToast();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -41,15 +44,41 @@ const LoginForm = () => {
     try {
       setIsLoading(true);
       
-      // Simulate API call
+      // Check if admin login
+      if (formData.email === 'amish0609@gmail.com' && formData.password === 'Amish0609@2003') {
+        await login({
+          id: 'admin-1',
+          name: 'Admin User',
+          email: formData.email,
+          role: 'admin'
+        });
+        
+        toast({
+          title: "Admin Login Successful",
+          description: "Welcome to the admin dashboard.",
+        });
+        
+        navigate('/admin');
+        return;
+      }
+      
+      // Regular user login simulation
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulate login (this would be replaced by actual authentication)
+      await login({
+        id: 'user-1',
+        name: 'John Doe',
+        email: formData.email,
+        role: 'member'
+      });
       
       toast({
         title: "Success!",
         description: "You have successfully logged in.",
       });
       
-      // Redirect would happen here (or through React Router)
+      navigate('/dashboard');
     } catch (error) {
       toast({
         title: "Login Failed",
