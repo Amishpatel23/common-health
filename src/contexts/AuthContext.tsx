@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -227,7 +228,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  // Logout function
+  // Logout function - Modified to navigate to home page
   const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
@@ -235,7 +236,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast({
       description: "You have been logged out",
     });
-    navigate('/login');
+    // Redirect to the home page
+    navigate('/');
   };
 
   // Request password reset function
@@ -271,6 +273,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast({
         description: "Your password has been reset successfully",
       });
+      // Redirect to login page after successful reset
+      navigate('/login');
     } catch (err: any) {
       setError(err.message || 'Failed to reset password');
       toast({

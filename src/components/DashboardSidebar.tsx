@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -10,11 +11,13 @@ import {
   User,
   ChevronRight,
   Heart,
-  LogOut
+  LogOut,
+  HelpCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface SidebarLinkProps {
   icon: React.ElementType;
@@ -126,8 +129,9 @@ const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) 
           <p className="text-xs text-muted-foreground">Contact our support team for assistance with your account or sessions.</p>
           <Link 
             to="/contact" 
-            className="text-xs text-primary hover:underline inline-block"
+            className="flex items-center text-xs text-primary hover:underline"
           >
+            <HelpCircle className="h-3 w-3 mr-1" />
             Contact Support
           </Link>
         </div>

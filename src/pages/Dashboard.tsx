@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardSidebar from '@/components/DashboardSidebar';
+import DashboardNavbar from '@/components/DashboardNavbar';
 import OverviewCard from '@/components/dashboard/OverviewCard';
 import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
 import TrainerRecommendation from '@/components/dashboard/TrainerRecommendation';
@@ -114,6 +116,7 @@ const Dashboard = () => {
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   useEffect(() => {
     // Scroll to top on page load
@@ -161,6 +164,10 @@ const Dashboard = () => {
     navigate('/chat');
   };
   
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
   // Create a personalized greeting based on user role and name
   const getGreeting = () => {
     if (!user) return "Welcome";
@@ -184,6 +191,8 @@ const Dashboard = () => {
       <div className="min-h-screen flex flex-col">
         <div className="flex-1 pt-16 lg:pl-64">
           <DashboardSidebar />
+          <DashboardNavbar onMenuClick={toggleMobileSidebar} />
+          <DashboardSidebar isMobile={true} onClose={() => setIsMobileSidebarOpen(false)} />
           
           <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
             {/* Loading skeleton UI */}
@@ -221,6 +230,10 @@ const Dashboard = () => {
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 pt-16 lg:pl-64">
         <DashboardSidebar />
+        <DashboardNavbar onMenuClick={toggleMobileSidebar} />
+        {isMobileSidebarOpen && (
+          <DashboardSidebar isMobile={true} onClose={() => setIsMobileSidebarOpen(false)} />
+        )}
         
         <main 
           className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 ${

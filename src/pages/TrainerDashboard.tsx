@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import TrainerDashboardSidebar from '@/components/TrainerDashboardSidebar';
+import TrainerDashboardNavbar from '@/components/TrainerDashboardNavbar';
 import OverviewCard from '@/components/dashboard/OverviewCard';
 import ActiveSessionBanner from '@/components/trainer/ActiveSessionBanner';
 import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
@@ -118,6 +119,7 @@ const TrainerDashboard = () => {
   
   const [isLoading, setIsLoading] = useState(true);
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -134,6 +136,10 @@ const TrainerDashboard = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
   
   const getTrainerName = () => {
     if (!user) return 'Trainer';
@@ -209,8 +215,9 @@ const TrainerDashboard = () => {
       <div className="min-h-screen flex flex-col">
         <div className="flex-1">
           <TrainerDashboardSidebar />
+          <TrainerDashboardNavbar onMenuClick={toggleMobileSidebar} />
           
-          <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6 lg:pl-64 pt-6">
+          <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-6 lg:pl-64 pt-16">
             <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -241,9 +248,13 @@ const TrainerDashboard = () => {
     <div className="min-h-screen flex flex-col">
       <div className="flex-1">
         <TrainerDashboardSidebar />
+        <TrainerDashboardNavbar onMenuClick={toggleMobileSidebar} />
+        {isMobileSidebarOpen && (
+          <TrainerDashboardSidebar isMobile={true} onClose={() => setIsMobileSidebarOpen(false)} />
+        )}
         
         <main 
-          className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 lg:pl-64 pt-6 ${
+          className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 lg:pl-64 pt-16 ${
             contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           } transition-all duration-500`}
         >
@@ -283,26 +294,34 @@ const TrainerDashboard = () => {
                 className="cursor-pointer hover:border-primary/50 hover-lift"
               />
             </div>
-            <OverviewCard
-              title="Total Sessions"
-              value="42"
-              description="8 completed this month"
-              icon={<Clock className="h-5 w-5" />}
-            />
-            <OverviewCard
-              title="Total Earnings"
-              value="$1,240"
-              description="$320 pending payout"
-              icon={<DollarSign className="h-5 w-5" />}
-            />
-            <OverviewCard
-              title="Availability"
-              value={availabilityStatus}
-              description="Next available: Today, 5PM-8PM"
-              icon={<Users className="h-5 w-5" />}
-              onClick={handleUpdateAvailability}
-              className="cursor-pointer hover:border-primary/50 hover-lift"
-            />
+            <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+              <OverviewCard
+                title="Total Sessions"
+                value="42"
+                description="8 completed this month"
+                icon={<Clock className="h-5 w-5" />}
+                className="hover-lift"
+              />
+            </div>
+            <div className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+              <OverviewCard
+                title="Total Earnings"
+                value="$1,240"
+                description="$320 pending payout"
+                icon={<DollarSign className="h-5 w-5" />}
+                className="hover-lift"
+              />
+            </div>
+            <div className="animate-fade-in" style={{ animationDelay: '600ms' }}>
+              <OverviewCard
+                title="Availability"
+                value={availabilityStatus}
+                description="Next available: Today, 5PM-8PM"
+                icon={<Users className="h-5 w-5" />}
+                onClick={handleUpdateAvailability}
+                className="cursor-pointer hover:border-primary/50 hover-lift"
+              />
+            </div>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

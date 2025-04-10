@@ -16,6 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface SidebarLinkProps {
   icon: React.ElementType;
@@ -82,8 +83,7 @@ const TrainerDashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebar
     )}>
       <div className="p-4 space-y-6 h-full flex flex-col">
         <div className="pt-6 pb-1">
-          {/* User profile section */}
-          <div className="flex items-center gap-3 mb-6 px-3">
+          <div className="flex items-center gap-3 mb-4 px-3">
             <Avatar className="h-10 w-10">
               <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
               <AvatarFallback>{getInitials()}</AvatarFallback>
@@ -120,7 +120,7 @@ const TrainerDashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebar
           <h3 className="font-medium text-sm">Trainer Support</h3>
           <p className="text-xs text-muted-foreground">Need help with your trainer account or have questions about payments?</p>
           <Link 
-            to="/trainer-support" 
+            to="/contact" 
             className="inline-flex items-center text-xs text-primary hover:underline"
           >
             <HelpCircle className="mr-1 h-3 w-3" />

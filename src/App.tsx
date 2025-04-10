@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -68,20 +69,23 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
 // Auth-aware Layout component that handles the navbar logic
 const AppLayout = () => {
   const location = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
+  // Determine if this is an authentication route
   const isAuthRoute = location.pathname === '/login' || 
                       location.pathname === '/signup' || 
                       location.pathname === '/forgot-password' || 
                       location.pathname.includes('/reset-password');
+                    
+  // Determine if this is a video session route
   const isVideoSessionRoute = location.pathname.includes('/video-session');
-  const isTrainerRoute = 
+  
+  // Determine if this is a dashboard route
+  const isDashboardRoute = 
+    location.pathname === '/dashboard' || 
     location.pathname.includes('/trainer-dashboard') || 
     location.pathname.includes('/manage-availability') ||
-    location.pathname.includes('/earnings');
-  const isDashboardRoute = 
-    location.pathname.includes('/dashboard') || 
-    isTrainerRoute ||
+    location.pathname.includes('/earnings') ||
     location.pathname.includes('/admin') ||
     location.pathname.includes('/chat') ||
     location.pathname.includes('/find-trainers') ||
