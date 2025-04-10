@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
 
 interface SidebarLinkProps {
   icon: React.ElementType;
@@ -49,7 +49,7 @@ interface DashboardSidebarProps {
 const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) => {
   const location = useLocation();
   const { user, logout } = useAuth();
-  const toast = useToast();
+  const { toast } = useToast();
   
   const sidebarLinks = [
     { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -61,7 +61,6 @@ const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) 
     { icon: User, label: "Profile", href: "/profile" },
   ];
 
-  // Get user initials for avatar fallback
   const getInitials = () => {
     if (!user?.name) return 'U';
     return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -81,7 +80,6 @@ const DashboardSidebar = ({ isMobile = false, onClose }: DashboardSidebarProps) 
       isMobile ? "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out" : "w-64 hidden lg:block"
     )}>
       <div className="p-4 space-y-6 h-full flex flex-col">
-        {/* User profile section */}
         <div className="pt-6 pb-1">
           <div className="flex items-center gap-3 mb-4 px-3">
             <Avatar className="h-10 w-10">
