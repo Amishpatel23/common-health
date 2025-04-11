@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import AuthLayout from '@/components/auth/AuthLayout';
 import LoginForm from '@/components/LoginForm';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
+import { Info, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Login: React.FC = () => {
   const [showAdminInfo, setShowAdminInfo] = useState(false);
@@ -15,15 +16,15 @@ const Login: React.FC = () => {
       subheading="Welcome back! Please enter your credentials to continue."
     >
       {showAdminInfo && (
-        <Alert className="mb-6">
-          <Info className="h-4 w-4" />
-          <AlertTitle>Admin Access</AlertTitle>
+        <Alert className="mb-6 border-red-200">
+          <Shield className="h-4 w-4 text-red-500" />
+          <AlertTitle className="text-red-700">Admin Access</AlertTitle>
           <AlertDescription>
             For admin access, use these credentials:
             <br />
-            Email: amish0609@gmail.com
+            Email: <span className="font-mono bg-gray-100 px-1 rounded">amish0609@gmail.com</span>
             <br />
-            Password: Amish0609@2003
+            Password: <span className="font-mono bg-gray-100 px-1 rounded">Amish0609@2003</span>
           </AlertDescription>
         </Alert>
       )}
@@ -31,12 +32,14 @@ const Login: React.FC = () => {
       <LoginForm />
       
       <div className="text-center mt-6">
-        <button 
+        <Button 
           onClick={() => setShowAdminInfo(!showAdminInfo)}
-          className="text-sm text-muted-foreground hover:underline"
+          variant="ghost"
+          size="sm"
+          className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5"
         >
           {showAdminInfo ? 'Hide admin info' : 'Admin login info'}
-        </button>
+        </Button>
       </div>
       
       <div className="text-center mt-6">

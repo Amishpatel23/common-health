@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Download, UserPlus, Filter } from 'lucide-react';
+import { Download, UserPlus, Filter, UsersIcon, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BackButton from '@/components/BackButton';
 import { 
@@ -20,9 +20,12 @@ interface AdminActionBarProps {
   showAddUser?: boolean;
   showExport?: boolean;
   showFilter?: boolean;
+  showSettings?: boolean;
   filterOptions?: string[];
   title?: string;
   subtitle?: string;
+  onSettingsClick?: () => void;
+  actionButtons?: React.ReactNode;
 }
 
 const AdminActionBar = ({ 
@@ -33,9 +36,12 @@ const AdminActionBar = ({
   showAddUser = true,
   showExport = true,
   showFilter = false,
+  showSettings = false,
   filterOptions = [],
   title,
-  subtitle
+  subtitle,
+  onSettingsClick,
+  actionButtons
 }: AdminActionBarProps) => {
   return (
     <div className="flex flex-col space-y-4 mb-6">
@@ -61,6 +67,9 @@ const AdminActionBar = ({
               <DropdownMenuContent>
                 <DropdownMenuLabel>Filter by</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleFilter && handleFilter('all')}>
+                  All
+                </DropdownMenuItem>
                 {filterOptions.map((option) => (
                   <DropdownMenuItem 
                     key={option} 
@@ -86,6 +95,15 @@ const AdminActionBar = ({
               Add User
             </Button>
           )}
+
+          {showSettings && (
+            <Button variant="outline" onClick={onSettingsClick}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </Button>
+          )}
+          
+          {actionButtons}
         </div>
       </div>
     </div>

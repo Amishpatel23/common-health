@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -32,9 +33,13 @@ const BackButton: React.FC<BackButtonProps> = ({ className = '', fallbackPath = 
     else if (location.pathname.includes('/trainer-dashboard')) {
       return '/trainer-dashboard';
     }
+    // Check if in payments area
+    else if (location.pathname.includes('/payments')) {
+      return '/dashboard';
+    }
     // Default to member dashboard
     else {
-      return '/dashboard';
+      return fallbackPath || '/dashboard';
     }
   };
   

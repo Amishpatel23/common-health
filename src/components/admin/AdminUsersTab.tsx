@@ -3,31 +3,14 @@ import React from 'react';
 import { Search, MoreVertical } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import UsersTable from './UsersTable';
 
 interface User {
   id: string;
   name: string;
   email: string;
   role: 'member' | 'trainer' | 'admin';
-  status: 'active' | 'inactive';
+  status: 'active' | 'inactive' | 'suspended' | 'pending';
   joinDate: string;
 }
 
@@ -44,11 +27,36 @@ const AdminUsersTab = ({
   setSearchQuery, 
   handleUserAction 
 }: AdminUsersTabProps) => {
+  // Count statistics
+  const memberCount = users.filter(user => user.role === 'member').length;
+  const trainerCount = users.filter(user => user.role === 'trainer').length;
+  const adminCount = users.filter(user => user.role === 'admin').length;
+  const activeCount = users.filter(user => user.status === 'active').length;
+  
   return (
     <Card>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <CardTitle>User Management</CardTitle>
+          <div>
+            <CardTitle>User Management</CardTitle>
+            <CardDescription className="mt-1">
+              Manage user accounts, roles, and permissions.
+            </CardDescription>
+            <div className="flex flex-wrap gap-2 mt-2 text-sm">
+              <span className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded-md">
+                {memberCount} Members
+              </span>
+              <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-0.5 rounded-md">
+                {trainerCount} Trainers
+              </span>
+              <span className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-0.5 rounded-md">
+                {adminCount} Admins
+              </span>
+              <span className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 px-2 py-0.5 rounded-md">
+                {activeCount} Active
+              </span>
+            </div>
+          </div>
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -60,78 +68,18 @@ const AdminUsersTab = ({
             />
           </div>
         </div>
-        <CardDescription>
-          Manage user accounts, roles, and permissions.
-        </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Join Date</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <span className={`capitalize ${
-                    user.role === 'admin' 
-                      ? 'text-purple-600' 
-                      : user.role === 'trainer' 
-                        ? 'text-blue-600' 
-                        : ''
-                  }`}>
-                    {user.role}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    user.status === 'active' 
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
-                      : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                  }`}>
-                    {user.status}
-                  </span>
-                </TableCell>
-                <TableCell>{user.joinDate}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                        <span className="sr-only">Actions</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => handleUserAction(user.id, 'View')}>
-                        View details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleUserAction(user.id, 'Edit')}>
-                        Edit user
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        onClick={() => handleUserAction(user.id, user.status === 'active' ? 'Deactivate' : 'Activate')}
-                        className={user.status === 'active' ? 'text-red-600' : 'text-green-600'}
-                      >
-                        {user.status === 'active' ? 'Deactivate' : 'Activate'} user
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <UsersTable 
+          users={users} 
+          onEdit={(userId) => handleUserAction(userId, 'Edit')}
+          onSuspend={(userId) => {
+            const user = users.find(u => u.id === userId);
+            const action = user?.status === 'active' ? 'Deactivate' : 'Activate';
+            handleUserAction(userId, action);
+          }}
+          onDelete={(userId) => handleUserAction(userId, 'Delete')}
+        />
       </CardContent>
     </Card>
   );
