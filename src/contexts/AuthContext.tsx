@@ -198,7 +198,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  // Signup function
+  // Signup function - MODIFIED to not automatically log in the user
   const signup = async (userData: { firstName: string, email: string, password: string, role: 'member' | 'trainer' }) => {
     setIsLoading(true);
     setError(null);
