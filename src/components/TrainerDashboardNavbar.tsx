@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Menu, Bell } from 'lucide-react';
+import { Menu, Bell, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
 
 interface TrainerDashboardNavbarProps {
   onMenuClick?: () => void;
@@ -13,11 +15,22 @@ interface TrainerDashboardNavbarProps {
 
 const TrainerDashboardNavbar = ({ onMenuClick }: TrainerDashboardNavbarProps) => {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [isOnline, setIsOnline] = useState(true);
 
   // Get user initials for avatar fallback
   const getInitials = () => {
     if (!user?.name) return 'T';
     return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const handleStatusToggle = (checked: boolean) => {
+    setIsOnline(checked);
+    toast({
+      description: checked 
+        ? "You're now online and visible to members" 
+        : "You're now offline and not accepting new sessions",
+    });
   };
 
   return (
@@ -51,7 +64,24 @@ const TrainerDashboardNavbar = ({ onMenuClick }: TrainerDashboardNavbarProps) =>
           </div>
 
           {/* User actions */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-2">
+              <div className="flex items-center">
+                {isOnline ? 
+                  <Wifi className="h-4 w-4 text-green-500 mr-2" /> : 
+                  <WifiOff className="h-4 w-4 text-gray-400 mr-2" />
+                }
+                <span className="text-sm font-medium mr-2">
+                  {isOnline ? 'Online' : 'Offline'}
+                </span>
+                <Switch 
+                  checked={isOnline}
+                  onCheckedChange={handleStatusToggle}
+                  aria-label="Online status toggle"
+                />
+              </div>
+            </div>
+            
             <Button 
               variant="ghost" 
               size="icon" 

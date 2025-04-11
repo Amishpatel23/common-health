@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -10,11 +9,11 @@ import UpcomingSessionCard from '@/components/dashboard/UpcomingSessionCard';
 import SessionRequestsTable from '@/components/trainer/SessionRequestsTable';
 import UpcomingSessionsTable from '@/components/dashboard/UpcomingSessionsTable';
 import RecentChatsList from '@/components/dashboard/RecentChatsList';
-import { Calendar, Clock, DollarSign, Users, Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Users, Calendar as CalendarIcon, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import AdminActionBar from '@/components/admin/AdminActionBar';
 
-// Mock data
 const mockUpcomingSessions = [
   {
     id: '1',
@@ -121,6 +120,13 @@ const TrainerDashboard = () => {
   const [contentLoaded, setContentLoaded] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
+  const [platformStats, setPlatformStats] = useState({
+    totalMembers: 427,
+    totalTrainers: 84,
+    sessionsToday: 36,
+    totalConnectedMembers: 18
+  });
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -209,6 +215,13 @@ const TrainerDashboard = () => {
     });
     navigate('/manage-availability');
   };
+
+  const handleViewBlockedMembers = () => {
+    toast({
+      description: "Viewing blocked members...",
+    });
+    // This would navigate to a blocked members page in a real application
+  };
   
   if (isLoading) {
     return (
@@ -264,24 +277,13 @@ const TrainerDashboard = () => {
             </div>
           )}
           
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-              <h1 className="text-2xl sm:text-3xl font-bold">
-                {getGreeting()}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Here's an overview of your training business.
-              </p>
-            </div>
-            <Button 
-              className="shrink-0 animate-fade-in" 
-              style={{ animationDelay: '200ms' }}
-              onClick={handleUpdateAvailability}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              Update Availability
-            </Button>
-          </div>
+          <AdminActionBar
+            showBackButton={false}
+            showAddUser={false}
+            showExport={false}
+            title={getGreeting()}
+            subtitle="Here's an overview of your training business"
+          />
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="animate-fade-in" style={{ animationDelay: '300ms' }}>
@@ -296,10 +298,10 @@ const TrainerDashboard = () => {
             </div>
             <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
               <OverviewCard
-                title="Total Sessions"
-                value="42"
-                description="8 completed this month"
-                icon={<Clock className="h-5 w-5" />}
+                title="Connected Members"
+                value={platformStats.totalConnectedMembers.toString()}
+                description={`${platformStats.sessionsToday} sessions today`}
+                icon={<Users className="h-5 w-5" />}
                 className="hover-lift"
               />
             </div>
@@ -310,6 +312,7 @@ const TrainerDashboard = () => {
                 description="$320 pending payout"
                 icon={<DollarSign className="h-5 w-5" />}
                 className="hover-lift"
+                onClick={() => navigate('/earnings')}
               />
             </div>
             <div className="animate-fade-in" style={{ animationDelay: '600ms' }}>
@@ -317,7 +320,7 @@ const TrainerDashboard = () => {
                 title="Availability"
                 value={availabilityStatus}
                 description="Next available: Today, 5PM-8PM"
-                icon={<Users className="h-5 w-5" />}
+                icon={<Clock className="h-5 w-5" />}
                 onClick={handleUpdateAvailability}
                 className="cursor-pointer hover:border-primary/50 hover-lift"
               />
@@ -326,21 +329,6 @@ const TrainerDashboard = () => {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '700ms' }}>
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">Session Requests</h2>
-                  <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                    {mockSessionRequests.length} New
-                  </span>
-                </div>
-                
-                <SessionRequestsTable
-                  requests={mockSessionRequests}
-                  onAccept={handleAcceptRequest}
-                  onReject={handleRejectRequest}
-                />
-              </div>
-              
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
@@ -392,26 +380,31 @@ const TrainerDashboard = () => {
               </div>
               
               <div className="border border-border rounded-xl p-5 bg-white dark:bg-black">
-                <h2 className="text-xl font-semibold mb-3">Quick Availability</h2>
+                <h2 className="text-xl font-semibold mb-3">Platform Statistics</h2>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Update your availability to let members book sessions with you.
+                  Current activity on the Confetti platform
                 </p>
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Today</span>
-                    <span className="font-medium">5:00 PM - 8:00 PM</span>
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Total Members</span>
+                    <span className="font-medium">{platformStats.totalMembers}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Tomorrow</span>
-                    <span className="font-medium">9:00 AM - 12:00 PM</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Total Trainers</span>
+                    <span className="font-medium">{platformStats.totalTrainers}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Wednesday</span>
-                    <span className="font-medium">2:00 PM - 6:00 PM</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Sessions Today</span>
+                    <span className="font-medium">{platformStats.sessionsToday}</span>
+                  </div>
+                  <div className="h-[1px] bg-border my-4"></div>
+                  <div className="flex items-center justify-between font-medium">
+                    <span className="text-sm">Your Connected Members</span>
+                    <span className="font-semibold text-primary">{platformStats.totalConnectedMembers}</span>
                   </div>
                 </div>
-                <Button onClick={handleUpdateAvailability} className="w-full">
-                  Manage Schedule
+                <Button variant="outline" size="sm" onClick={handleViewBlockedMembers} className="w-full">
+                  View Blocked Members
                 </Button>
               </div>
             </div>
