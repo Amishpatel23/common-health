@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -122,6 +123,16 @@ const PaymentHistory = () => {
     toast({
       description: "Invoice download started",
     });
+    
+    // Simulate PDF generation and download
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.href = '#'; // In a real app, this would be a URL to the generated PDF
+      link.setAttribute('download', `invoice-${paymentId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }, 1000);
   };
   
   // Helper function to format currency
@@ -205,143 +216,178 @@ const PaymentHistory = () => {
   // Render loading skeleton
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-16 lg:pl-64">
-        <div className="max-w-7xl mx-auto p-4 md:p-6">
-          <div className="mb-8">
-            <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded-md shimmer mb-2 w-48"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md shimmer w-64"></div>
-          </div>
-          
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
-            <div className="h-12 bg-gray-200 dark:bg-gray-800 shimmer w-full"></div>
-            <div className="p-4 space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-16 bg-gray-200 dark:bg-gray-800 rounded-md shimmer"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <DashboardLayout title="Payments & Billing" description="Loading your payment history...">
+        <div className="h-96 bg-gray-200 dark:bg-gray-800 rounded-lg shimmer"></div>
+      </DashboardLayout>
     );
   }
   
   return (
-    <div className="min-h-screen pt-16 lg:pl-64">
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">Payments & Billing</h1>
-          <p className="text-muted-foreground">View your payment history and manage your billing information</p>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Plan</CardTitle>
-              <CardDescription>Your current membership plan</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Premium</span>
-                  <span className="font-semibold text-sm bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded">
-                    Active
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Billing cycle</span>
-                  <span>Monthly</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Next payment</span>
-                  <span>June 15, 2023</span>
-                </div>
-                <div className="flex justify-between items-center font-medium">
-                  <span>Amount</span>
-                  <span>$99.00</span>
-                </div>
-                <Button variant="outline" className="w-full">
-                  Manage Subscription
-                </Button>
+    <DashboardLayout 
+      title="Payments & Billing" 
+      description="View your payment history and manage your billing information"
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Current Plan</CardTitle>
+            <CardDescription>Your current membership plan</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Premium</span>
+                <span className="font-semibold text-sm bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded">
+                  Active
+                </span>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Payment Methods</CardTitle>
-              <CardDescription>Your saved payment methods</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-8 bg-[#1434CB] rounded flex items-center justify-center text-white font-bold text-xs">
-                    VISA
-                  </div>
-                  <div>
-                    <p className="font-medium">Visa ending in 4242</p>
-                    <p className="text-xs text-muted-foreground">Expires 05/25</p>
-                  </div>
-                </div>
-                
-                <Button variant="outline" className="w-full">
-                  Manage Payment Methods
-                </Button>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Billing cycle</span>
+                <span>Monthly</span>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Billing Address</CardTitle>
-              <CardDescription>Your current billing address</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-sm">
-                  <p className="font-medium">Sarah Wilson</p>
-                  <p>123 Fitness St</p>
-                  <p>Exercise City, CA 90210</p>
-                  <p>United States</p>
-                </div>
-                
-                <Button variant="outline" className="w-full">
-                  Update Address
-                </Button>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Next payment</span>
+                <span>June 15, 2023</span>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="rounded-lg border border-border bg-card overflow-hidden">
-          <Tabs defaultValue="all">
-            <div className="border-b px-4">
-              <TabsList className="h-12">
-                <TabsTrigger value="all" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary">
-                  All Transactions
-                </TabsTrigger>
-                <TabsTrigger value="sessions" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary">
-                  Session Payments
-                </TabsTrigger>
-                <TabsTrigger value="membership" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary">
-                  Membership Fees
-                </TabsTrigger>
-              </TabsList>
+              <div className="flex justify-between items-center font-medium">
+                <span>Amount</span>
+                <span>$99.00</span>
+              </div>
+              <Button variant="outline" className="w-full">
+                Manage Subscription
+              </Button>
             </div>
-            
-            <TabsContent value="all" className="m-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Method</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment Methods</CardTitle>
+            <CardDescription>Your saved payment methods</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-8 bg-[#1434CB] rounded flex items-center justify-center text-white font-bold text-xs">
+                  VISA
+                </div>
+                <div>
+                  <p className="font-medium">Visa ending in 4242</p>
+                  <p className="text-xs text-muted-foreground">Expires 05/25</p>
+                </div>
+              </div>
+              
+              <Button variant="outline" className="w-full">
+                Manage Payment Methods
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Billing Address</CardTitle>
+            <CardDescription>Your current billing address</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-sm">
+                <p className="font-medium">Sarah Wilson</p>
+                <p>123 Fitness St</p>
+                <p>Exercise City, CA 90210</p>
+                <p>United States</p>
+              </div>
+              
+              <Button variant="outline" className="w-full">
+                Update Address
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <Tabs defaultValue="all">
+          <div className="border-b px-4">
+            <TabsList className="h-12">
+              <TabsTrigger value="all" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary">
+                All Transactions
+              </TabsTrigger>
+              <TabsTrigger value="sessions" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary">
+                Session Payments
+              </TabsTrigger>
+              <TabsTrigger value="membership" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary">
+                Membership Fees
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <TabsContent value="all" className="m-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell className="font-medium">
+                      {formatDate(payment.date)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {payment.trainer && (
+                          <img 
+                            src={payment.trainer.avatar} 
+                            alt={payment.trainer.name} 
+                            className="w-6 h-6 rounded-full object-cover"
+                          />
+                        )}
+                        <span>{payment.description}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{renderStatusBadge(payment.status)}</TableCell>
+                    <TableCell>{renderPaymentMethod(payment.method)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(payment.amount)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDownloadInvoice(payment.id)}
+                        className="text-muted-foreground"
+                      >
+                        <FileText className="h-4 w-4 mr-1" />
+                        Receipt
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payments.map((payment) => (
+                ))}
+              </TableBody>
+            </Table>
+          </TabsContent>
+          
+          <TabsContent value="sessions" className="m-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments
+                  .filter(payment => payment.trainer)
+                  .map((payment) => (
                     <TableRow key={payment.id}>
                       <TableCell className="font-medium">
                         {formatDate(payment.date)}
@@ -374,106 +420,53 @@ const PaymentHistory = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-            
-            <TabsContent value="sessions" className="m-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Method</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payments
-                    .filter(payment => payment.trainer)
-                    .map((payment) => (
-                      <TableRow key={payment.id}>
-                        <TableCell className="font-medium">
-                          {formatDate(payment.date)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {payment.trainer && (
-                              <img 
-                                src={payment.trainer.avatar} 
-                                alt={payment.trainer.name} 
-                                className="w-6 h-6 rounded-full object-cover"
-                              />
-                            )}
-                            <span>{payment.description}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{renderStatusBadge(payment.status)}</TableCell>
-                        <TableCell>{renderPaymentMethod(payment.method)}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(payment.amount)}</TableCell>
-                        <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleDownloadInvoice(payment.id)}
-                            className="text-muted-foreground"
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            Receipt
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-            
-            <TabsContent value="membership" className="m-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Method</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payments
-                    .filter(payment => !payment.trainer)
-                    .map((payment) => (
-                      <TableRow key={payment.id}>
-                        <TableCell className="font-medium">
-                          {formatDate(payment.date)}
-                        </TableCell>
-                        <TableCell>{payment.description}</TableCell>
-                        <TableCell>{renderStatusBadge(payment.status)}</TableCell>
-                        <TableCell>{renderPaymentMethod(payment.method)}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(payment.amount)}</TableCell>
-                        <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleDownloadInvoice(payment.id)}
-                            className="text-muted-foreground"
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            Receipt
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-          </Tabs>
-        </div>
+              </TableBody>
+            </Table>
+          </TabsContent>
+          
+          <TabsContent value="membership" className="m-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments
+                  .filter(payment => !payment.trainer)
+                  .map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell className="font-medium">
+                        {formatDate(payment.date)}
+                      </TableCell>
+                      <TableCell>{payment.description}</TableCell>
+                      <TableCell>{renderStatusBadge(payment.status)}</TableCell>
+                      <TableCell>{renderPaymentMethod(payment.method)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(payment.amount)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleDownloadInvoice(payment.id)}
+                          className="text-muted-foreground"
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          Receipt
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TabsContent>
+        </Tabs>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
