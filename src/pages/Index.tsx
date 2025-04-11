@@ -1,52 +1,46 @@
 
-import React, { useEffect, useState } from 'react';
-import Hero from '@/components/Hero';
-import HowItWorksSection from '@/components/HowItWorks';
-import TrainerShowcase from '@/components/TrainerShowcase';
-import Testimonials from '@/components/Testimonials';
-import CTABanner from '@/components/CTABanner';
-import Footer from '@/components/Footer';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import Hero from '../components/Hero';
+import HowItWorks from '../components/HowItWorks';
+import TrainerShowcase from '../components/TrainerShowcase';
+import Testimonials from '../components/Testimonials';
+import CTABanner from '../components/CTABanner';
+import Footer from '../components/Footer';
+import { Button } from '@/components/ui/button';
+import SessionStartNotification from '@/components/SessionStartNotification';
 
 const Index = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Improved page loading with guaranteed visibility
-  useEffect(() => {
-    // Scroll to top on page load
-    window.scrollTo(0, 0);
-    
-    // Add a small delay to ensure DOM is ready before animations
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-      
-      // Force a reflow to ensure animations trigger properly
-      document.body.getBoundingClientRect();
-      
-      // Additional technique to ensure visibility
-      const sections = document.querySelectorAll('section');
-      sections.forEach(section => {
-        section.classList.add('section-visible');
-      });
-    }, 100);
-    
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
+  const [showSessionNotification, setShowSessionNotification] = useState(false);
+  
+  // Function to demonstrate the session notification
+  const handleDemoNotification = () => {
+    setShowSessionNotification(true);
+  };
+  
   return (
-    <div 
-      className={`min-h-screen flex flex-col ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
-      style={{ visibility: isLoaded ? 'visible' : 'hidden' }}
-    >
-      <main>
-        <Hero />
-        <HowItWorksSection />
-        <TrainerShowcase />
-        <Testimonials />
-        <CTABanner />
-      </main>
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <Hero />
+      <HowItWorks />
+      <TrainerShowcase />
+      <Testimonials />
+      <div className="container mx-auto py-12 text-center">
+        <h2 className="text-2xl font-semibold mb-4">Try Our Session Notification</h2>
+        <p className="mb-6 text-muted-foreground">Click the button below to see the session notification demo</p>
+        <Button onClick={handleDemoNotification} className="bg-green-600 hover:bg-green-700">
+          Demo Session Notification
+        </Button>
+      </div>
+      <CTABanner />
       <Footer />
+      
+      <SessionStartNotification
+        isOpen={showSessionNotification}
+        onOpenChange={setShowSessionNotification}
+        sessionId="demo-session-123"
+      />
     </div>
   );
 };
