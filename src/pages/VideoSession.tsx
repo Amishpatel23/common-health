@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -15,7 +14,8 @@ import {
   Maximize,
   Minimize,
   User,
-  SendHorizontal
+  SendHorizontal,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from "@/components/ui/textarea";
@@ -27,6 +27,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from '@/contexts/AuthContext';
+
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+];
 
 const getMockSessionData = (sessionId: string) => {
   return {
@@ -93,7 +99,6 @@ const ChatMessage = ({ message, isTrainer }: ChatMessageProps) => {
   );
 };
 
-// Incoming call dialog component
 const IncomingCallDialog = ({ 
   isOpen, 
   callerName, 
@@ -162,35 +167,157 @@ const VideoSession = () => {
   const [newMessage, setNewMessage] = useState('');
   const [remainingTime, setRemainingTime] = useState(45 * 60); // 45 minutes in seconds
   const [isConnecting, setIsConnecting] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'reconnecting' | 'failed'>('connecting');
   const [isIncomingCall, setIsIncomingCall] = useState(false);
   const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackRating, setFeedbackRating] = useState(5);
+  const [hasPermissions, setHasPermissions] = useState(false);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
+  
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Simulate connecting and incoming call for demo purposes
-  useEffect(() => {
-    // Simulate connection delay
-    const connectTimer = setTimeout(() => {
-      setIsConnecting(false);
+  const createPeerConnection = useCallback(() => {
+    try {
+      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
       
-      // For demo: if no sessionId specified, simulate incoming call
-      if (!sessionId) {
-        setTimeout(() => {
-          setIsIncomingCall(true);
-        }, 1500);
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => {
+          if (localStreamRef.current) {
+            pc.addTrack(track, localStreamRef.current);
+          }
+        });
       }
-    }, 2000);
-    
-    return () => clearTimeout(connectTimer);
-  }, [sessionId]);
+      
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          console.log('New ICE candidate:', event.candidate);
+        }
+      };
+      
+      pc.onconnectionstatechange = () => {
+        console.log('Connection state change:', pc.connectionState);
+        switch (pc.connectionState) {
+          case 'connected':
+            setConnectionStatus('connected');
+            toast({
+              description: "Connected to session partner",
+            });
+            break;
+          case 'disconnected':
+          case 'failed':
+            setConnectionStatus('failed');
+            toast({
+              title: "Connection problem",
+              description: "The connection to your session partner has been lost",
+              variant: "destructive",
+            });
+            break;
+          case 'connecting':
+            setConnectionStatus('connecting');
+            break;
+        }
+      };
+      
+      pc.ontrack = (event) => {
+        console.log('Received remote track:', event.track.kind);
+        if (remoteVideoRef.current && event.streams[0]) {
+          remoteVideoRef.current.srcObject = event.streams[0];
+        }
+      };
+      
+      peerConnectionRef.current = pc;
+      return pc;
+    } catch (err) {
+      console.error('Error creating peer connection:', err);
+      toast({
+        title: "Connection Error",
+        description: "Failed to establish WebRTC connection",
+        variant: "destructive",
+      });
+      return null;
+    }
+  }, [toast]);
   
-  // Start timer once connected
+  const setupLocalMedia = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+      
+      localStreamRef.current = stream;
+      setHasPermissions(true);
+      setPermissionError(null);
+      
+      return stream;
+    } catch (err: any) {
+      console.error('Error accessing media devices:', err);
+      setHasPermissions(false);
+      setPermissionError(err.message || 'Failed to access camera or microphone');
+      
+      toast({
+        title: "Permission Error",
+        description: `Failed to access your camera or microphone: ${err.message}`,
+        variant: "destructive",
+      });
+      
+      return null;
+    }
+  }, [toast]);
+  
   useEffect(() => {
-    if (isConnecting) return;
+    const initializeSession = async () => {
+      setIsConnecting(true);
+      
+      const localStream = await setupLocalMedia();
+      
+      if (!localStream) {
+        setConnectionStatus('failed');
+        setIsConnecting(false);
+        return;
+      }
+      
+      setTimeout(() => {
+        createPeerConnection();
+        setIsConnecting(false);
+        setConnectionStatus('connected');
+      }, 2000);
+    };
+    
+    if (!sessionId) {
+      setTimeout(() => {
+        setIsIncomingCall(true);
+      }, 1500);
+    } else {
+      initializeSession();
+    }
+    
+    return () => {
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+      }
+      
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [sessionId, setupLocalMedia, createPeerConnection]);
+  
+  useEffect(() => {
+    if (connectionStatus !== 'connected') return;
     
     const timer = setInterval(() => {
       setRemainingTime(prev => {
@@ -204,9 +331,8 @@ const VideoSession = () => {
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [isConnecting]);
+  }, [connectionStatus]);
   
-  // Scroll to bottom of chat when messages change
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -235,7 +361,6 @@ const VideoSession = () => {
     setChatMessages([...chatMessages, newChatMessage]);
     setNewMessage('');
     
-    // Simulate reply from the other party
     setTimeout(() => {
       const replyMessage = {
         id: `msg${chatMessages.length + 2}`,
@@ -249,8 +374,24 @@ const VideoSession = () => {
     }, 3000);
   };
   
-  const toggleVideo = () => setIsVideoEnabled(prev => !prev);
-  const toggleAudio = () => setIsAudioEnabled(prev => !prev);
+  const toggleVideo = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getVideoTracks().forEach(track => {
+        track.enabled = !track.enabled;
+      });
+      setIsVideoEnabled(prev => !prev);
+    }
+  };
+  
+  const toggleAudio = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getAudioTracks().forEach(track => {
+        track.enabled = !track.enabled;
+      });
+      setIsAudioEnabled(prev => !prev);
+    }
+  };
+  
   const toggleChat = () => setIsChatOpen(prev => !prev);
   
   const toggleFullscreen = () => {
@@ -275,13 +416,23 @@ const VideoSession = () => {
     setIsIncomingCall(false);
     setIsConnecting(true);
     
-    // Simulate connection
-    setTimeout(() => {
-      setIsConnecting(false);
-      toast({
-        description: "Call connected successfully",
-      });
-    }, 2000);
+    const initializeSession = async () => {
+      const localStream = await setupLocalMedia();
+      
+      if (!localStream) {
+        setConnectionStatus('failed');
+        setIsConnecting(false);
+        return;
+      }
+      
+      setTimeout(() => {
+        createPeerConnection();
+        setIsConnecting(false);
+        setConnectionStatus('connected');
+      }, 2000);
+    };
+    
+    initializeSession();
   };
   
   const handleDeclineCall = () => {
@@ -294,6 +445,14 @@ const VideoSession = () => {
   
   const endSession = () => {
     setIsFeedbackDialogOpen(true);
+    
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+    }
+    
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+    }
   };
   
   const handleSubmitFeedback = () => {
@@ -314,7 +473,6 @@ const VideoSession = () => {
     navigate(redirectPath);
   };
   
-  // If we're showing the incoming call dialog
   if (isIncomingCall) {
     return (
       <IncomingCallDialog 
@@ -327,13 +485,45 @@ const VideoSession = () => {
     );
   }
   
-  // If still connecting
   if (isConnecting) {
     return (
       <div className="h-screen flex items-center justify-center bg-background flex-col gap-4">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         <h2 className="text-xl font-semibold">Connecting to session...</h2>
         <p className="text-muted-foreground">Setting up your video connection</p>
+        {permissionError && (
+          <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md max-w-md text-center">
+            <AlertCircle className="mx-auto h-6 w-6 mb-2" />
+            <p className="font-medium">Permission Error</p>
+            <p className="text-sm mt-1">{permissionError}</p>
+            <Button 
+              className="mt-3"
+              onClick={() => navigate(-1)}
+            >
+              Go Back
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  if (connectionStatus === 'failed' && !isConnecting) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background flex-col gap-4">
+        <AlertCircle className="h-16 w-16 text-destructive" />
+        <h2 className="text-xl font-semibold">Connection Failed</h2>
+        <p className="text-muted-foreground max-w-md text-center">
+          We couldn't establish a connection to your session partner. This could be due to network issues or permissions problems.
+        </p>
+        <div className="flex gap-3 mt-4">
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            Go Back
+          </Button>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
@@ -351,6 +541,13 @@ const VideoSession = () => {
               {formatTime(remainingTime)} remaining
             </span>
           </div>
+          
+          {connectionStatus === 'reconnecting' && (
+            <div className="text-amber-500 text-sm flex items-center gap-1">
+              <span className="animate-pulse inline-block w-2 h-2 rounded-full bg-amber-500"></span>
+              Reconnecting...
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-2">
@@ -363,16 +560,14 @@ const VideoSession = () => {
       
       <div className="flex flex-1 overflow-hidden">
         <div className="relative flex-1 bg-black" ref={videoContainerRef}>
-          {/* Main video - Shows the other participant */}
-          {isVideoEnabled ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <img 
-                src={user?.role === 'trainer' ? sessionData.member.avatar : sessionData.trainer.avatar} 
-                alt="Other participant" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className={`absolute inset-0 w-full h-full object-cover ${!isVideoEnabled ? 'hidden' : ''}`}
+          />
+          
+          {!isVideoEnabled && (
             <div className="absolute inset-0 flex items-center justify-center bg-neutral-900">
               <div className="text-center">
                 <div className="w-20 h-20 mx-auto bg-secondary rounded-full flex items-center justify-center mb-2">
@@ -385,15 +580,16 @@ const VideoSession = () => {
             </div>
           )}
           
-          {/* Self video */}
           <div className="absolute bottom-4 right-4 w-48 h-36 rounded-lg overflow-hidden border-2 border-background shadow-lg">
-            {isVideoEnabled ? (
-              <img 
-                src={user?.role === 'trainer' ? sessionData.trainer.avatar : sessionData.member.avatar} 
-                alt="Your Video" 
-                className="w-full h-full object-cover"
-              />
-            ) : (
+            <video
+              ref={localVideoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover ${!isVideoEnabled ? 'hidden' : ''}`}
+            />
+            
+            {!isVideoEnabled && (
               <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
                 <div className="text-center">
                   <div className="w-10 h-10 mx-auto bg-primary/20 rounded-full flex items-center justify-center mb-1">
@@ -405,7 +601,6 @@ const VideoSession = () => {
             )}
           </div>
           
-          {/* Participant info */}
           <div className="absolute top-4 left-4 bg-black/30 backdrop-blur-sm rounded-lg p-2 text-white">
             <div className="flex items-center gap-2">
               <img 
@@ -425,7 +620,6 @@ const VideoSession = () => {
           </div>
         </div>
         
-        {/* Chat panel */}
         <div className={`w-[300px] border-l border-border flex flex-col bg-background transition-transform duration-300 ease-in-out ${
           isChatOpen || window.innerWidth >= 768 ? 'translate-x-0' : 'translate-x-full hidden'
         }`}>
@@ -528,7 +722,6 @@ const VideoSession = () => {
         </Button>
       </div>
       
-      {/* Feedback dialog */}
       <Dialog open={isFeedbackDialogOpen} onOpenChange={setIsFeedbackDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
