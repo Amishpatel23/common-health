@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import BackButton from '@/components/BackButton';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,7 +11,6 @@ const MySessions: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("upcoming");
   
-  // Mock data for sessions - in a real app, this would come from an API
   const upcomingSessions = [
     {
       id: "1",
@@ -61,7 +59,6 @@ const MySessions: React.FC = () => {
     },
   ];
 
-  // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
@@ -73,7 +70,6 @@ const MySessions: React.FC = () => {
     });
   };
 
-  // Get status badge color based on status
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "confirmed":
@@ -91,7 +87,6 @@ const MySessions: React.FC = () => {
     }
   };
 
-  // Render session card
   const renderSessionCard = (session: any) => (
     <Card key={session.id} className="mb-4 hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
@@ -137,7 +132,7 @@ const MySessions: React.FC = () => {
   );
 
   return (
-    <DashboardLayout>
+    <DashboardLayout title="My Sessions">
       <div className="container mx-auto p-4 max-w-5xl">
         <div className="flex items-center mb-6">
           <BackButton className="mr-4" />
