@@ -11,6 +11,7 @@ import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
+import MySessions from './pages/MySessions';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="/admin/*" element={<AdminPanel />} />
+          <Route path="/my-sessions" element={<MySessions />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

@@ -7,9 +7,14 @@ import { ChevronLeft } from 'lucide-react';
 interface BackButtonProps {
   className?: string;
   fallbackPath?: string;
+  label?: string;
 }
 
-const BackButton: React.FC<BackButtonProps> = ({ className = '', fallbackPath = '/' }) => {
+const BackButton: React.FC<BackButtonProps> = ({ 
+  className = '', 
+  fallbackPath = '/', 
+  label = 'Back'
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -28,6 +33,10 @@ const BackButton: React.FC<BackButtonProps> = ({ className = '', fallbackPath = 
     // Check if in admin area
     if (location.pathname.includes('/admin')) {
       return '/admin';
+    }
+    // Check if in my-sessions area
+    else if (location.pathname.includes('/my-sessions')) {
+      return '/dashboard';
     }
     // Check if in trainer area
     else if (location.pathname.includes('/trainer-dashboard')) {
@@ -51,7 +60,7 @@ const BackButton: React.FC<BackButtonProps> = ({ className = '', fallbackPath = 
       onClick={handleGoBack}
     >
       <ChevronLeft className="h-4 w-4" />
-      <span>Back</span>
+      <span>{label}</span>
     </Button>
   );
 };
