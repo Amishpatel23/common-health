@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import BackgroundEffect from '@/components/BackgroundEffect';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -31,7 +32,8 @@ const AuthLayout = ({ children, heading, subheading, imageSrc = "/lovable-upload
       </div>
       
       {/* Right side - Auth form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-white">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-gradient-to-br from-blue-50 to-purple-50">
+        <BackgroundEffect />
         <div className="w-full max-w-md">
           {/* Logo and heading */}
           <div className="text-center mb-8">
